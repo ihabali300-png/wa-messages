@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f2a44">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>رسايل العملاء – تبوك بارك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f2a44;--blue:#1d5a8a;--gold:#f2c14e;--bg:#f3f6fa;--card:#fff;--line:#dfe6ee;--ink:#1b2733;--mute:#6b7a89;--green:#1fa855}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Cairo,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6}
+header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:16px 18px 18px;position:relative}
+#updBtn{position:absolute;left:14px;top:14px;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer}
+#updBtn.has::after{content:"1";position:absolute;top:-5px;right:-5px;background:#e53935;color:#fff;font-size:11px;font-weight:800;width:17px;height:17px;border-radius:4px;line-height:17px}
+#updBtn.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+#updCard{position:fixed;inset:auto 12px 12px 12px;max-width:420px;margin:0 auto;background:#fff;border:2px solid var(--gold);border-radius:16px;padding:14px;box-shadow:0 8px 30px #0004;display:none;z-index:50}
+#updCard.on{display:block}#updCard .uh{font-weight:800;margin-bottom:6px}#updCard ul{padding-inline-start:18px;margin-bottom:10px}
+#updCard .ub{display:flex;gap:8px}#updCard button{flex:1;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:800;cursor:pointer}#updNow{background:var(--navy);color:#fff}#updLater{background:#eef2f6}
+header h1{font-size:21px;font-weight:800}
+header p{font-size:13.5px;opacity:.85}
+.count{display:inline-block;margin-top:6px;background:rgba(255,255,255,.15);border-radius:20px;padding:2px 12px;font-size:13px}
+.wrap{max-width:980px;margin:0 auto;padding:12px;display:grid;gap:12px}
+@media(min-width:900px){.wrap{grid-template-columns:1fr 1fr;align-items:start}.out{position:sticky;top:12px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.card h2{font-size:17px;font-weight:800;margin-bottom:6px}
+.lbl{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+.lbl small{font-weight:600;color:var(--mute);font-size:12.5px}
+input[type=text],input[type=tel],textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;background:#fbfcfe;color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--blue)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip:disabled{opacity:.35;cursor:default}
+.years{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.years .chip{border-radius:12px;padding:9px;font-size:16px;font-weight:800}
+.months{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.months .chip{border-radius:10px;padding:7px 2px;font-size:13.5px}
+.hint{font-size:12.5px;color:var(--mute);margin-top:5px}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:14px;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--navy);flex:none}
+.why{background:#fff8e6;border:1px solid #f3dca0;border-radius:12px;padding:8px 12px;font-size:14px;margin-bottom:10px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.more{margin-top:10px;border:1px dashed var(--line);border-radius:12px;padding:8px 12px}
+.more summary{font-weight:700;font-size:14px;cursor:pointer;color:var(--blue)}
+.why b{display:block}
+.tab{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:5px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink)}
+.tab.on{border-color:var(--gold);background:#fff4d6}
+textarea#msg{min-height:250px;resize:vertical;font-size:15.5px;line-height:1.75;background:#e9f8ee;border-color:#cfe9d8}
+.phone{display:flex;gap:8px;align-items:center;margin-top:12px}
+.phone input{flex:1}
+.pin{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;border:1.5px solid var(--line);border-radius:12px;padding:9px 10px}
+.pin input{width:18px;height:18px;accent-color:var(--navy)}
+.pin.on{background:#e8f0f8;border-color:var(--blue)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.btn{border:0;border-radius:12px;padding:12px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+.b-copy{background:var(--navy);color:#fff}
+.b-wa{background:var(--green);color:#fff}
+.b-wa.off{background:#b9c4cf;pointer-events:none}
+.b-new{grid-column:1/-1;background:#eef2f6;color:var(--ink)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1}
+.warn{color:#b3261e;font-size:13px;margin-top:4px;display:none}
+</style>
+</head>
+<body>
+<header>
+  <button id="updBtn" aria-label="تحديث">⟳</button>
+  <h1>💬 رسايل العملاء الذكية</h1>
+  <p>اختار من الفاتورة، وخد الرسالة اللي على مقاس العميل</p>
+  <span class="count" id="count">📊 اتبعت النهارده: 0</span>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <h2>🧾 من الفاتورة</h2>
+
+    <span class="lbl">🛍️ الفاتورة فيها إيه؟ <small>(اختار أكتر من حاجة)</small></span>
+    <div class="chips" id="items">
+      <button class="chip" data-v="rx">👓 نظارة طبية</button>
+      <button class="chip" data-v="tint">🌈 طبية تلوين</button>
+      <button class="chip" data-v="sun">😎 نظارة شمسية</button>
+      <button class="chip" data-v="frame">🔲 فريم طبي فقط</button>
+      <button class="chip" data-v="cl">💧 عدسات لاصقة</button>
+      <button class="chip" data-v="sol">🧴 محلول</button>
+      <button class="chip" data-v="acc">🎀 إكسسوار</button>
+      <button class="chip" data-v="multi">👥 أكتر من قطعة من نفس النوع</button>
+    </div>
+
+    <span class="lbl">📅 آخر زيارة</span>
+    <div class="years" id="years"></div>
+    <div class="months" id="months"></div>
+    <div class="hint" id="sinceHint">اختار السنة وبعدها الشهر</div>
+
+    <span class="lbl">👤 اسم العميل <small>(اختياري)</small></span>
+    <input type="text" id="name" placeholder="مثلًا: حاتم">
+    <div class="chips" id="title" style="margin-top:8px">
+      <button class="chip on" data-v="m1">👨 الغالي</button>
+      <button class="chip" data-v="f1">👩 الغالية</button>
+      <button class="chip" data-v="m0">👨 بدون لقب</button>
+      <button class="chip" data-v="f0">👩 بدون لقب</button>
+    </div>
+    <div class="hint">الرسالة هتتكتب بصيغة الراجل أو الست على حسب اختيارك</div>
+
+    <label class="toggle"><input type="checkbox" id="offer" checked> 🎁 ضيف عرض اشترِ واحدة والثانية مجانًا</label>
+  </section>
+
+  <section class="card out">
+    <h2>✉️ الرسالة</h2>
+    <div class="why" id="why"></div>
+    <textarea id="msg" aria-label="نص الرسالة"></textarea>
+    <details class="more"><summary>💡 رسايل تانية تنفع معاه</summary><div class="tabs" id="tabs"></div></details>
+    <div class="hint">تقدر تعدّل في النص قبل ما تبعته</div>
+
+    <div class="phone">
+      <input type="tel" id="phone" placeholder="رقم الواتس (اختياري)" inputmode="tel">
+      <label class="pin" id="pinWrap"><input type="checkbox" id="pin"> 📌 ثبّت</label>
+    </div>
+    <div class="warn" id="phoneWarn">الرقم مش مظبوط، راجعه</div>
+    <div class="hint">لو ثبّته، هيفضل موجود حتى لو دوست عميل جديد</div>
+
+    <div class="btns">
+      <button class="btn b-copy" id="copy">📋 نسخ</button>
+      <a class="btn b-wa" id="wa" href="#" target="_blank" rel="noopener">📤 ابعت واتساب</a>
+      <div class="hint" id="waHint" style="grid-column:1/-1;text-align:center"></div>
+      <button class="btn b-new" id="reset">🔄 عميل جديد</button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const now=new Date(),NY=now.getFullYear(),NM=now.getMonth()+1;
+const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const state={title:"m1",items:new Set(),year:null,month:null,pick:null};
+
+document.querySelectorAll('#items .chip').forEach(b=>b.onclick=()=>{
+  const v=b.dataset.v;
+  state.items.has(v)?state.items.delete(v):state.items.add(v);
+  b.classList.toggle('on');state.pick=null;render();
+});
+document.querySelectorAll('#title .chip').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#title .chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');state.title=b.dataset.v;render();
+});
+function drawDate(){
+  $('#years').innerHTML=[NY,NY-1].map(y=>`<button class="chip ${state.year===y?'on':''}" data-y="${y}">${y}</button>`).join("");
+  document.querySelectorAll('#years .chip').forEach(b=>b.onclick=()=>{
+    state.year=+b.dataset.y;
+    if(state.year===NY&&state.month>NM)state.month=null;
+    state.pick=null;drawDate();render();
+  });
+  $('#months').innerHTML=MONTHS.map((m,i)=>{
+    const dis=!state.year||(state.year===NY&&i+1>NM);
+    return `<button class="chip ${state.month===i+1&&!dis?'on':''}" data-m="${i+1}" ${dis?'disabled':''}>${m} ${i+1}</button>`;
+  }).join("");
+  document.querySelectorAll('#months .chip').forEach(b=>b.onclick=()=>{state.month=+b.dataset.m;state.pick=null;drawDate();render();});
+}
+drawDate();
+$('#name').oninput=render;
+$('#offer').onchange=render;
+
+function monthsAgo(){if(!state.year||!state.month)return null;return (NY-state.year)*12+(NM-state.month);}
+function since(m){
+  if(m<=0)return "أيام";if(m===1)return "شهر";if(m===2)return "شهرين";
+  if(m<=10)return m+" شهور";if(m<=13)return "سنة";if(m<=21)return "أكثر من سنة";return "سنتين تقريبًا";
+}
+const has=k=>state.items.has(k);
+const glassesCount=()=>["rx","tint","sun","frame"].filter(has).length;
+const fem=()=>state.title[0]==="f";
+const G=(m,f)=>fem()?f:m;
+
+function product(){
+  const rx=has("rx"),tint=has("tint"),sun=has("sun"),frame=has("frame"),cl=has("cl"),sol=has("sol");
+  if((rx||tint||frame)&&sun)return "نظاراتك";
+  if(tint&&!rx)return "نظارتك الطبية الملوّنة";
+  if(rx||tint)return "نظارتك الطبية";
+  if(frame)return "نظارتك";
+  if(sun)return "نظارتك الشمسية";
+  if(cl)return "عدساتك اللاصقة";
+  if(sol)return "محلول العدسات";
+  return "مشترياتك";
+}
+function greet(){
+  const n=$('#name').value.trim(),t=state.title[1]==="1"?G("بالغالي","بالغالية"):"";
+  if(n&&t)return "هلا والله "+t+" "+n+" ✨";
+  if(n)return "هلا والله يا "+n+" ✨";
+  if(t)return "هلا والله "+t+" ✨";
+  return "هلا والله ✨";
+}
+const OFFER="🎁 وعندنا عرض: اشترِ واحدة والثانية مجانًا على منتجات مختارة ⏳ لفترة محدودة";
+const VISIT=()=>G("تمر علينا الصباح ولا المساء؟ 🕘🌙","تمرين علينا الصباح ولا المساء؟ 🕘🌙");
+const TRY=()=>G("الموديلات ما تنحكم عليها بالصورة، لازم تجربها على وجهك 😉","الموديلات ما تنحكم عليها بالصورة، لازم تجربينها على وجهك 😉");
+
+const T={
+  exam:{label:"👁️ فحص مجاني",build:c=>[
+    c.g,
+    c.m!==null?"صار لك "+c.since+" من آخر زيارة لنا 😊 نتمنى إن "+c.p+" مريحة معك":"نتمنى إن "+c.p+" مريحة معك 😊",
+    G("وصار وقت فحص النظر 👁️ والفحص عندنا مجاني، عشان تتطمن إن مقاسك ما تغيّر","وصار وقت فحص النظر 👁️ والفحص عندنا مجاني، عشان تتطمنين إن مقاسك ما تغيّر"),
+    has("sun")&&!has("rx")&&!has("tint")?G("وتقدر تسوي نظارة طبية بنفس ستايل شمسيتك 👓","وتقدرين تسوين نظارة طبية بنفس ستايل شمسيتك 👓"):null,
+    c.offer?OFFER:null, VISIT()]},
+  rate:{label:"📝 تقييم",build:c=>[
+    c.g,
+    "كيف "+c.p+" معك؟ "+(c.onlyCl?"💧":"👓"),
+    G("رأيك يفرق معنا 🌷 ردّ بحرف واحد بس:","رأيك يفرق معنا 🌷 ردّي بحرف واحد بس:"),
+    "أ) ممتازة 😍","ب) حلوة 😊","ج) تحتاج تعديل 🔧",
+    c.onlyCl?G("وإذا حسّيت بأي إزعاج في العين، الفحص عندنا مجاني 👁️","وإذا حسّيتي بأي إزعاج في العين، الفحص عندنا مجاني 👁️"):"وإذا تحتاج أي ضبط، الصيانة عندنا مجانية إذا حالتها تسمح 👌"]},
+  fix:{label:"🔧 صيانة مجانية",build:c=>[
+    c.g,
+    c.m!==null&&c.m>=2?"صار لك "+c.since+" مع "+c.p+" 👓":"نتمنى إن "+c.p+" مريحة معك 👓",
+    G("حاسس إنها نازلة على أنفك، أو تضغط على الأذن، أو تحتاج تنظيف؟ 🤔","حاسة إنها نازلة على أنفك، أو تضغط على الأذن، أو تحتاج تنظيف؟ 🤔"),
+    G("مرّ علينا ونسوي لها صيانة مجانية إذا حالتها تسمح 🔧✨","مرّي علينا ونسوي لها صيانة مجانية إذا حالتها تسمح 🔧✨"),
+    G("وبالمرة تقدر تسوي فحص نظر مجاني 👁️","وبالمرة تقدرين تسوين فحص نظر مجاني 👁️"),
+    c.offer?OFFER:null, VISIT()]},
+  family:{label:"👨‍👩‍👧 للأهل",build:c=>[
+    c.g,
+    G("نتمنى إن "+c.p+" عجبتكم أنت وأهلك 🤍","نتمنى إن "+c.p+" عجبتكم أنتِ وأهلك 🤍"),
+    c.offer?"وعرضنا الحالي يخليها أسهل: اشترِ واحدة والثانية مجانًا على منتجات مختارة 🎁":null,
+    "تعالوا مع بعض، والفحص مجاني للكل 👁️ وكل واحد يجرب ويختار اللي يناسب وجهه 👨‍👩‍👧",
+    "متى يناسبكم تمرون؟ 🗓️"]},
+  rxFromSun:{label:"👓 طبية بنفس الستايل",build:c=>[
+    c.g,
+    "نتمنى إن "+c.p+" عاجبتك 😎",
+    "عندك نظارة طبية بنفس الستايل؟ 👓 والفحص عندنا مجاني",
+    c.offer?OFFER:null, TRY(), VISIT()]},
+  sun:{label:"😎 شمسية",build:c=>[
+    c.g.replace("✨","☀️"),
+    "شمس تبوك قوية، وعيونك تستاهل حماية 😎",
+    "نتمنى إن "+c.p+" مريحة معك 👓",
+    G("وتقدر تاخذ نظارة شمسية بنفس مقاسك الطبي 🕶️","وتقدرين تاخذين نظارة شمسية بنفس مقاسك الطبي 🕶️"),
+    c.offer?OFFER:null, TRY(), VISIT()]},
+  clear:{label:"🌙 طبية شفافة",build:c=>[
+    c.g,
+    "نتمنى إن "+c.p+" عاجبتك 🌈",
+    "عندك نظارة طبية شفافة للبيت والسواقة بالليل؟ 🌙",
+    G("العدسة الملوّنة ممتازة بالنهار، لكن بالليل تحتاج عدسة شفافة عشان تشوف أوضح 🚗","العدسة الملوّنة ممتازة بالنهار، لكن بالليل تحتاجين عدسة شفافة عشان تشوفين أوضح 🚗"),
+    c.offer?OFFER:null, VISIT()]},
+  lenses:{label:"🔍 عدسات للفريم",build:c=>[
+    c.g,
+    "نتمنى إن فريمك الجديد عاجبك 👓",
+    G("تبي نركّب له عدسات بمقاسك؟ والفحص عندنا مجاني 👁️","تبين نركّب له عدسات بمقاسك؟ والفحص عندنا مجاني 👁️"),
+    "عندنا عدسات كورية ويابانية بجودة عالية، ونساعدك تختار الأنسب لاستخدامك ✨",
+    c.offer?OFFER:null, VISIT()]},
+  spare:{label:"🔁 احتياطية",build:c=>[
+    c.g,
+    "عندك نظارة احتياطية؟ 🤔",
+    "لو انكسرت "+c.p+" أو ضاعت، يومك كله بيتعطل 😅",
+    c.offer?"الحين فرصتك: اشترِ واحدة والثانية مجانًا على منتجات مختارة 🎁":null,
+    G("مقاسك محفوظ عندنا، تجرب وتختار في دقائق ⏱️","مقاسك محفوظ عندنا، تجربين وتختارين في دقائق ⏱️"),
+    VISIT()]},
+  cl:{label:"💧 تجديد العدسات",build:c=>[
+    c.g,
+    has("cl")?"صار لك "+(c.m!==null?c.since:"فترة")+" مع "+c.p+" 💧":"قرّب محلول العدسات يخلص؟ 🧴",
+    has("cl")?"نتمنى إنها مريحة معك، وإذا قرّبت علبتك تخلص جهّزنا لك الجاية 📦":"عندنا محاليل وعدسات لاصقة يومية وشهرية 💧",
+    "ولا تنسى إن فحص النظر عندنا مجاني 👁️",
+    "وللأيام اللي ترتاح فيها عيونك من العدسات، عندنا نظارات تناسبك 👓",
+    c.offer?OFFER:null, VISIT()]},
+  general:{label:"🤍 عامة",build:c=>[
+    c.g,
+    "نتمنى إن "+c.p+" عجبتك 🤍",
+    "حابين نذكرك إن فحص النظر عندنا مجاني 👁️",
+    c.offer?OFFER:null, TRY(), VISIT()]},
+};
+
+/* الترتيب الذكي: المدة من آخر زيارة هي اللي بتحدد الهدف */
+function plan(){
+  const m=monthsAgo(),list=[],why={};
+  const add=(k,r)=>{if(!list.includes(k)){list.push(k);why[k]=r;}};
+  const glasses=glassesCount()>0;
+  const onlySun=has("sun")&&!has("rx")&&!has("tint")&&!has("frame");
+  const contacts=has("cl")||has("sol");
+  const cross=()=>{
+    if(has("multi")||glassesCount()>=2)add("family","فرحة الشراء لسه موجودة، والفاتورة فيها أكتر من قطعة، فاعزم أهله يستفيدوا من العرض");
+    if(onlySun)add("rxFromSun","فرحة الشراء لسه موجودة، وهو عنده شمسية بس، فأنسب حاجة طبية بنفس الستايل");
+    if(has("tint"))add("clear","عنده طبية ملوّنة، ودي متنفعش بالليل، فاعرض عليه طبية شفافة");
+    if((has("rx")||has("tint"))&&!has("sun"))add("sun","فرحة الشراء لسه موجودة، وعنده طبية من غير شمسية، فأنسب حاجة شمسية بنفس المقاس");
+  };
+
+  if(m===null){
+    add("general","اختار آخر زيارة عشان أحددلك الرسالة الأنسب بدقة");
+  }
+  if(!glasses&&!contacts&&state.items.size){add("general","اشترى إكسسوار بس، فأنسب حاجة تعزمه على الفحص المجاني");}
+
+  if(m!==null){
+    if(m<=1){
+      add("rate","اشترى من قريب، فبدري تبيعله حاجة. اسأله عن رأيه الأول عشان تبني ثقة، والرد بحرف سهل جدًا");
+    }
+    if(has("frame"))add("lenses","اشترى فريم بس، يعني لسه محتاج عدسات، ودي أقرب فرصة بيع");
+    if(m>=11){
+      add("exam","عدّت حوالي سنة، ومقاسه غالبًا اتغيّر. الفحص المجاني أقوى سبب يجيبه، وأعلى فرصة يشتري نظارة جديدة");
+    }
+    if(contacts&&!glasses)add("cl","بيستخدم عدسات لاصقة، والعلبة أو المحلول غالبًا قرّب يخلص");
+    if(glasses&&m>=2&&m<=3)cross();
+    if(glasses&&m>=4&&m<=10)add("fix","عدّى على النظارة كام شهر، وغالبًا اتفكّت أو محتاجة ضبط. الصيانة المجانية سبب يجيبه من غير ضغط بيع، وفي المحل تعرض عليه الباقي");
+  }
+  /* بدائل */
+  if(glasses){cross();add("fix","الصيانة المجانية سبب يجيبه من غير ضغط");add("spare","فكرة النظارة الاحتياطية تنفع مع أي حد عنده نظارة");}
+  if(contacts)add("cl","تذكير بتجديد العدسات أو المحلول");
+  add("exam","الفحص المجاني سبب يجيبه في أي وقت");
+  add("rate","تقدر تسأله عن رأيه في أي وقت");
+  add("general","رسالة عامة تنفع مع أي عميل");
+  return {list,why};
+}
+
+function render(){
+  const m=monthsAgo();
+  $('#sinceHint').textContent=m===null?"اختار السنة وبعدها الشهر":"⏱️ آخر زيارة من حوالي "+since(m);
+  const {list,why}=plan();
+  if(!state.pick||!list.includes(state.pick))state.pick=list[0];
+  const onlyCl=(has("cl")||has("sol"))&&glassesCount()===0;
+  const c={g:greet(),p:product(),m,since:m===null?"":since(m),offer:$('#offer').checked,onlyCl};
+  $('#msg').value=T[state.pick].build(c).filter(x=>x!==null).join("\n");
+  $('#why').innerHTML=(state.pick===list[0]?"<b>⭐ الرسالة الأنسب: "+T[state.pick].label+"</b>":"<b>💡 "+T[state.pick].label+"</b>")+"ليه؟ "+why[state.pick];
+  $('#tabs').innerHTML=list.map((k,i)=>`<button class="tab ${k===state.pick?'on':''}" data-k="${k}">${i===0?'⭐ ':''}${T[k].label}</button>`).join("");
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{state.pick=b.dataset.k;render();});
+  updateWa();
+}
+
+/* phone + pin */
+function normPhone(raw){
+  let s=(raw||"").replace(/[٠-٩]/g,c=>"٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace(/\D/g,"");
+  if(s.startsWith("00"))s=s.slice(2);
+  if(s.startsWith("05")&&s.length===10)s="966"+s.slice(1);
+  else if(s.startsWith("5")&&s.length===9)s="966"+s;
+  return s;
+}
+function updateWa(){
+  const raw=$('#phone').value,p=normPhone(raw),ok=/^\d{11,15}$/.test(p);
+  $('#phoneWarn').style.display=(raw.trim()&&!ok)?'block':'none';
+  const t=encodeURIComponent($('#msg').value);
+  $('#wa').href=ok?"https://api.whatsapp.com/send?phone="+p+"&text="+t:"https://api.whatsapp.com/send?text="+t;
+  $('#waHint').textContent=ok?"📤 هتفتح الشات على الرقم ده، والرسالة جاهزة، دوس إرسال ✅":"📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال";
+}
+const PKEY="wa-pinned-phone";
+function savePin(){try{$('#pin').checked?localStorage.setItem(PKEY,$('#phone').value):localStorage.removeItem(PKEY);}catch(e){}
+  $('#pinWrap').classList.toggle('on',$('#pin').checked);}
+try{const v=localStorage.getItem(PKEY);if(v){$('#phone').value=v;$('#pin').checked=true;}}catch(e){}
+$('#pinWrap').classList.toggle('on',$('#pin').checked);
+$('#pin').onchange=savePin;
+$('#phone').oninput=()=>{if($('#pin').checked)savePin();updateWa();};
+$('#msg').oninput=updateWa;
+
+/* counter */
+const KEY="wa-sent-"+now.toISOString().slice(0,10);
+function getCount(){try{return +(localStorage.getItem(KEY)||0)}catch(e){return 0}}
+let counted=false;
+function bump(){if(counted)return;counted=true;let n=getCount()+1;try{localStorage.setItem(KEY,n)}catch(e){}showCount(n);}
+function showCount(n){$('#count').textContent="📊 اتبعت النهارده: "+n;}
+showCount(getCount());
+
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
+
+$('#copy').onclick=async()=>{
+  try{if(window.AndroidBridge)AndroidBridge.copy($('#msg').value);else await navigator.clipboard.writeText($('#msg').value);toast("✅ اتنسخت");bump();}
+  catch(e){$('#msg').select();toast("حدّد النص وانسخه يدوي");}
+};
+$('#wa').addEventListener('click',()=>{updateWa();bump();});
+$('#reset').onclick=()=>{
+  $('#name').value="";
+  if(!$('#pin').checked)$('#phone').value="";
+  state.items.clear();document.querySelectorAll('#items .chip').forEach(x=>x.classList.remove('on'));
+  state.year=null;state.month=null;state.pick=null;counted=false;drawDate();render();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+render();
+</script>
+<div id="updCard"><div class="uh"><span id="updTitle">🆕 الجديد في التحديث</span> <b id="updVer"></b></div><ul id="updList"></ul><div class="ub"><button id="updNow">⟳ حدّث دلوقتي</button><button id="updLater">بعدين</button></div></div>
+<script>
+const APP_V = 1;
+(()=>{
+  const u=id=>document.getElementById(id),btn=u('updBtn'),card=u('updCard');let info=null;
+  const show=(j,done)=>{u('updVer').textContent='v'+j.v;u('updList').innerHTML=(j.notes||[]).map(n=>`<li>${n}</li>`).join('')||'<li>تحسينات عامة</li>';
+    u('updTitle').textContent=done?'✅ اتحدّث، الجديد في':'🆕 الجديد في التحديث';u('updNow').style.display=done?'none':'';u('updLater').textContent=done?'تمام':'بعدين';card.classList.add('on');};
+  const go=async()=>{card.classList.remove('on');btn.classList.add('spin');
+    try{if('serviceWorker'in navigator){const r=await navigator.serviceWorker.getRegistrations();await Promise.all(r.map(x=>x.update().catch(()=>{})));}
+      if(window.caches){const k=await caches.keys();await Promise.all(k.filter(x=>x.startsWith('wa-msg')).map(x=>caches.delete(x)));}}catch(e){}
+    const q=new URLSearchParams(location.search);q.set('_',Date.now());location.replace(location.pathname+'?'+q);};
+  fetch('version.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{info=j;
+    if((+j.v||0)>APP_V){btn.classList.add('has');setTimeout(()=>show(j,false),1200);}
+    else if(/[?&]_=\d/.test(location.search))setTimeout(()=>show(j,true),500);}).catch(()=>{});
+  btn.onclick=()=>{if(info&&+info.v>APP_V&&!card.classList.contains('on'))show(info,false);else go();};
+  u('updNow').onclick=go;u('updLater').onclick=()=>card.classList.remove('on');
+})();
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

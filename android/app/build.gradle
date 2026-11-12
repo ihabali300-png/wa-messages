@@ -1,0 +1,22 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.ihab.wamsg'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.ihab.wamsg'
+        minSdk 24
+        targetSdk 34
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
+        versionName "1.0." + (System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+    }
+    signingConfigs {
+        release {
+            storeFile file('wamsg-release.jks')
+            storePassword 'ihab-wamsg-2026'
+            keyAlias 'ihab'
+            keyPassword 'ihab-wamsg-2026'
+        }
+    }
+    buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
