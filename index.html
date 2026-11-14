@@ -64,14 +64,51 @@ textarea#msg{min-height:250px;resize:vertical;font-size:15.5px;line-height:1.75;
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
 .toast.show{opacity:1}
 .warn{color:#b3261e;font-size:13px;margin-top:4px;display:none}
+/* الموظف */
+.hrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.hrow .count{margin-top:0}
+.me{border:1px solid rgba(255,255,255,.35);background:rgba(242,193,78,.18);color:#fff;border-radius:20px;padding:2px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.ov{position:fixed;inset:0;background:#0f2a44cc;display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+.ov.on{display:flex}
+.box{background:#fff;border-radius:18px;padding:18px;width:100%;max-width:400px;border-top:5px solid var(--gold)}
+.box h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.box .chips{margin:12px 0 4px}
+.staff{display:flex;align-items:center;gap:4px}
+.staff .x{border:0;background:none;color:var(--mute);font-size:15px;cursor:pointer;padding:0 4px}
+.box input{margin-top:10px}
+.box .ub{display:flex;gap:8px;margin-top:12px}
+.box .ub button{flex:1;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:800;cursor:pointer}
+#staffSave{background:var(--navy);color:#fff}#staffCancel{background:#eef2f6}
+.share{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.share .btn{background:#fff4d6;color:var(--navy);border:1.5px solid var(--gold);padding:9px 14px;font-size:14px}
+.kbd{display:none}
+/* شاشة الكمبيوتر */
+@media(min-width:900px){
+  header{padding:18px 28px}
+  header .in{max-width:1200px;margin:0 auto}
+  #updBtn{left:28px;top:20px}
+  .wrap{max-width:1200px;padding:20px 28px;gap:20px;grid-template-columns:1.1fr 1fr}
+  .months{grid-template-columns:repeat(6,1fr)}
+  .card{padding:18px 22px}
+  textarea#msg{min-height:340px}
+  .kbd{display:block}
+  .share{grid-column:1}
+  .chip:hover:not(:disabled):not(.on),.tab:hover{border-color:var(--blue)}
+  .btn:hover{filter:brightness(1.08)}
+}
 </style>
 </head>
 <body>
 <header>
   <button id="updBtn" aria-label="تحديث">⟳</button>
+  <div class="in">
   <h1>💬 رسايل العملاء الذكية</h1>
   <p>اختار من الفاتورة، وخد الرسالة اللي على مقاس العميل</p>
-  <span class="count" id="count">📊 اتبعت النهارده: 0</span>
+  <div class="hrow">
+    <button class="me" id="meBtn" title="غيّر الموظف">👤 مين بيبعت؟</button>
+    <span class="count" id="count">📊 اتبعت النهارده: 0</span>
+  </div>
+  </div>
 </header>
 
 <div class="wrap">
@@ -128,9 +165,22 @@ textarea#msg{min-height:250px;resize:vertical;font-size:15.5px;line-height:1.75;
       <div class="hint" id="waHint" style="grid-column:1/-1;text-align:center"></div>
       <button class="btn b-new" id="reset">🔄 عميل جديد</button>
     </div>
+    <div class="hint kbd">⌨️ اختصارات: Ctrl+Enter ابعت واتساب · Alt+C نسخ · Alt+N عميل جديد</div>
+  </section>
+
+  <section class="card share">
+    <div class="hint" style="margin:0">🔖 احفظ الصفحة في البوك ماركس: على الكمبيوتر Ctrl+D، وعلى الموبايل ⋮ ثم ☆</div>
+    <button class="btn" id="shareBtn">📲 شارك الصفحة مع زميل</button>
   </section>
 </div>
 <div class="toast" id="toast"></div>
+<div class="ov" id="who"><div class="box">
+  <h3>👋 أهلًا! مين بيبعت من الجهاز ده؟</h3>
+  <div class="hint">اكتب اسمك مرة واحدة، وهيتحفظ، والعداد هيبقى خاص بيك. ولو الجهاز مشترك، كل واحد يختار اسمه</div>
+  <div class="chips" id="staffList"></div>
+  <input type="text" id="staffName" placeholder="اسمك، مثلًا: إيهاب" maxlength="20">
+  <div class="ub"><button id="staffSave">✅ حفظ</button><button id="staffCancel">إلغاء</button></div>
+</div></div>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -210,7 +260,7 @@ const T={
     "كيف "+c.p+" معك؟ "+(c.onlyCl?"💧":"👓"),
     G("رأيك يفرق معنا 🌷 ردّ بحرف واحد بس:","رأيك يفرق معنا 🌷 ردّي بحرف واحد بس:"),
     "أ) ممتازة 😍","ب) حلوة 😊","ج) تحتاج تعديل 🔧",
-    c.onlyCl?G("وإذا حسّيت بأي إزعاج في العين، الفحص عندنا مجاني 👁️","وإذا حسّيتي بأي إزعاج في العين، الفحص عندنا مجاني 👁️"):"وإذا تحتاج أي ضبط، الصيانة عندنا مجانية 👌"]},
+    c.onlyCl?G("وإذا حسّيت بأي إزعاج في العين، الفحص عندنا مجاني 👁️","وإذا حسّيتي بأي إزعاج في العين، الفحص عندنا مجاني 👁️"):G("وإذا تحتاج أي ضبط، الصيانة عندنا مجانية 👌","وإذا تحتاجين أي ضبط، الصيانة عندنا مجانية 👌")]},
   fix:{label:"🔧 صيانة مجانية",build:c=>[
     c.g,
     c.m!==null&&c.m>=2?"صار لك "+c.since+" مع "+c.p+" 👓":"نتمنى إن "+c.p+" مريحة معك 👓",
@@ -263,7 +313,7 @@ const T={
     c.g,
     has("cl")?"صار لك "+(c.m!==null?c.since:"فترة")+" مع "+c.p+" 💧":"قرّب محلول العدسات يخلص؟ 🧴",
     has("cl")?"نتمنى إنها مريحة معك، وإذا قرّبت علبتك تخلص جهّزنا لك الجاية 📦":"عندنا محاليل وعدسات لاصقة يومية وشهرية 💧",
-    "ولا تنسى إن فحص النظر عندنا مجاني 👁️",
+    G("ولا تنسى إن فحص النظر عندنا مجاني 👁️","ولا تنسين إن فحص النظر عندنا مجاني 👁️"),
     "وللأيام اللي ترتاح فيها عيونك من العدسات، عندنا نظارات تناسبك 👓",
     c.offer?OFFER:null, VISIT()]},
   general:{label:"🤍 عامة",build:c=>[
@@ -343,22 +393,89 @@ function updateWa(){
   $('#wa').href=ok?"https://api.whatsapp.com/send?phone="+p+"&text="+t:"https://api.whatsapp.com/send?text="+t;
   $('#waHint').textContent=ok?"📤 هتفتح الشات على الرقم ده، والرسالة جاهزة، دوس إرسال ✅":"📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال";
 }
-const PKEY="wa-pinned-phone";
-function savePin(){try{$('#pin').checked?localStorage.setItem(PKEY,$('#phone').value):localStorage.removeItem(PKEY);}catch(e){}
+/* storage helpers */
+const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},
+  set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+const day=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const LOAD_DAY=day();
+
+/* الموظف: الاسم بيتحفظ مرة واحدة، والجهاز المشترك يشيل أكتر من اسم */
+let staff=[];try{staff=JSON.parse(LS.get("wa-staff")||"[]")}catch(e){}
+let me=LS.get("wa-me");if(!staff.includes(me))me=staff[0]||null;
+const cKey=n=>"wa-sent-"+n+"-"+day();
+const pKey=()=>"wa-pinned-phone-"+me;
+
+function getCount(n=me){return n?+(LS.get(cKey(n))||0):0}
+let counted=false;
+function bump(){if(counted)return;if(!me){openWho();return;}counted=true;LS.set(cKey(me),getCount()+1);showMe();}
+function showMe(){
+  $('#meBtn').textContent=me?"👤 "+me+" ⇄":"👤 مين بيبعت؟";
+  $('#count').textContent="📊 اتبعت النهارده: "+getCount();
+}
+function loadPin(){
+  const v=me?LS.get(pKey()):null;
+  $('#pin').checked=!!v;if(v)$('#phone').value=v;
+  $('#pinWrap').classList.toggle('on',$('#pin').checked);
+}
+function savePin(){if(me){$('#pin').checked?LS.set(pKey(),$('#phone').value):LS.del(pKey());}
   $('#pinWrap').classList.toggle('on',$('#pin').checked);}
-try{const v=localStorage.getItem(PKEY);if(v){$('#phone').value=v;$('#pin').checked=true;}}catch(e){}
-$('#pinWrap').classList.toggle('on',$('#pin').checked);
+function setMe(n){
+  const wasPinned=$('#pin').checked;
+  me=n;LS.set("wa-me",n);
+  if(wasPinned)$('#phone').value="";
+  loadPin();showMe();updateWa();
+}
+function addStaff(n){
+  n=n.trim().replace(/\s+/g," ").slice(0,20);if(!n)return false;
+  if(!staff.includes(n)){
+    if(!staff.length){ /* أول اسم ياخد العداد والرقم المثبت القديم */
+      const oc=+(LS.get("wa-sent-"+new Date().toISOString().slice(0,10))||0);
+      if(oc)LS.set("wa-sent-"+n+"-"+day(),oc);
+      const op=LS.get("wa-pinned-phone");if(op){LS.set("wa-pinned-phone-"+n,op);LS.del("wa-pinned-phone");}
+    }
+    staff.push(n);LS.set("wa-staff",JSON.stringify(staff));
+  }
+  setMe(n);return true;
+}
+function drawStaff(){
+  $('#staffList').innerHTML=staff.map(n=>`<span class="chip staff ${n===me?'on':''}" data-n="${n.replace(/"/g,'&quot;')}">👤 ${n.replace(/</g,'&lt;')} · ${getCount(n)}<button class="x" title="امسح الاسم">✕</button></span>`).join("");
+  $('#staffList').querySelectorAll('.staff').forEach(el=>el.onclick=e=>{
+    const n=el.dataset.n;
+    if(e.target.classList.contains('x')){
+      if(!confirm("تمسح "+n+" من الجهاز ده؟"))return;
+      staff=staff.filter(x=>x!==n);LS.set("wa-staff",JSON.stringify(staff));
+      if(me===n){me=staff[0]||null;me?LS.set("wa-me",me):LS.del("wa-me");loadPin();showMe();}
+      drawStaff();return;
+    }
+    setMe(n);closeWho();toast("👋 أهلًا "+n);
+  });
+  $('#staffName').placeholder=staff.length?"أو ضيف اسم جديد":"اسمك، مثلًا: إيهاب";
+  $('#staffCancel').style.display=me?'':'none';
+}
+function openWho(){drawStaff();$('#staffName').value="";$('#who').classList.add('on');setTimeout(()=>$('#staffName').focus(),50);}
+function closeWho(){$('#who').classList.remove('on');}
+$('#meBtn').onclick=openWho;
+$('#staffCancel').onclick=closeWho;
+$('#staffSave').onclick=()=>{const n=$('#staffName').value;if(addStaff(n)){closeWho();toast("✅ اتحفظ، أهلًا "+me);}else if(me)closeWho();else $('#staffName').focus();};
+$('#staffName').onkeydown=e=>{if(e.key==="Enter")$('#staffSave').click();};
+
+loadPin();showMe();
+if(!me)setTimeout(openWho,300);
 $('#pin').onchange=savePin;
 $('#phone').oninput=()=>{if($('#pin').checked)savePin();updateWa();};
 $('#msg').oninput=updateWa;
 
-/* counter */
-const KEY="wa-sent-"+now.toISOString().slice(0,10);
-function getCount(){try{return +(localStorage.getItem(KEY)||0)}catch(e){return 0}}
-let counted=false;
-function bump(){if(counted)return;counted=true;let n=getCount()+1;try{localStorage.setItem(KEY,n)}catch(e){}showCount(n);}
-function showCount(n){$('#count').textContent="📊 اتبعت النهارده: "+n;}
-showCount(getCount());
+/* لو الصفحة فضلت مفتوحة على كمبيوتر الفرع لليوم اللي بعده، تتحدث لوحدها */
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&day()!==LOAD_DAY)location.reload();});
+
+/* شارك الصفحة */
+const SITE="https://ihabali300-png.github.io/wa-messages/";
+$('#shareBtn').onclick=async()=>{
+  const txt="💬 رسايل العملاء الذكية – تبوك بارك\nافتح الرابط واحفظه في البوك ماركس:\n"+SITE;
+  try{if(navigator.share&&!window.AndroidBridge){await navigator.share({title:"رسايل العملاء الذكية",text:txt});return;}}catch(e){if(e.name==="AbortError")return;}
+  try{if(window.AndroidBridge)AndroidBridge.copy(txt);else await navigator.clipboard.writeText(txt);toast("✅ الرابط اتنسخ، ابعته لزميلك");}
+  catch(e){prompt("انسخ الرابط:",SITE);}
+};
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
 
@@ -374,11 +491,18 @@ $('#reset').onclick=()=>{
   state.year=null;state.month=null;state.pick=null;counted=false;drawDate();render();
   window.scrollTo({top:0,behavior:'smooth'});
 };
+/* اختصارات الكيبورد للكمبيوتر */
+document.addEventListener('keydown',e=>{
+  if($('#who').classList.contains('on')){if(e.key==="Escape"&&me)closeWho();return;}
+  if(e.ctrlKey&&e.key==="Enter"){e.preventDefault();$('#wa').click();}
+  else if(e.altKey&&(e.code==="KeyC")){e.preventDefault();$('#copy').click();}
+  else if(e.altKey&&(e.code==="KeyN")){e.preventDefault();$('#reset').click();}
+});
 render();
 </script>
 <div id="updCard"><div class="uh"><span id="updTitle">🆕 الجديد في التحديث</span> <b id="updVer"></b></div><ul id="updList"></ul><div class="ub"><button id="updNow">⟳ حدّث دلوقتي</button><button id="updLater">بعدين</button></div></div>
 <script>
-const APP_V = 2;
+const APP_V = 3;
 (()=>{
   const u=id=>document.getElementById(id),btn=u('updBtn'),card=u('updCard');let info=null;
   const show=(j,done)=>{u('updVer').textContent='v'+j.v;u('updList').innerHTML=(j.notes||[]).map(n=>`<li>${n}</li>`).join('')||'<li>تحسينات عامة</li>';
