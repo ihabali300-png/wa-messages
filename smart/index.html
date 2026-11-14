@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رسايل واتساب الذكية – تبوك بارك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0f2340; --navy2:#1b355c; --gold:#e8b44a; --gold-soft:#fff6e3;
+    --green:#1faa59; --green-soft:#eaf8ef; --bg:#f3f5f9; --card:#fff;
+    --line:#e3e7ee; --muted:#6b7587; --text:#17202f; --red:#d9534f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 14px 40px}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:22px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+  header h1{margin:0;font-size:22px;font-weight:800}
+  header p{margin:4px 0 0;opacity:.85;font-size:14px}
+  header .glow{position:absolute;left:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:var(--gold);opacity:.18}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(15,35,64,.04)}
+  .card h2{margin:0 0 12px;font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .step{background:var(--navy);color:#fff;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:14px}
+  .label{font-weight:700;font-size:15px;margin:14px 0 8px}
+  .label small{color:var(--muted);font-weight:500}
+  .reasons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .reason{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:10px;text-align:right;cursor:pointer;font-family:inherit;color:var(--text);transition:.15s}
+  .reason b{display:block;font-size:15px}
+  .reason span{font-size:12.5px;color:var(--muted)}
+  .reason.on{border-color:var(--navy);background:#eef2f9;box-shadow:inset 0 0 0 1px var(--navy)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:14.5px;cursor:pointer;font-family:inherit;color:var(--text);transition:.15s}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  input[type=text],input[type=tel],input[type=url],textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;font-family:inherit;font-size:15.5px;background:#fff;color:var(--text);outline:none}
+  input:focus,textarea:focus{border-color:var(--navy2)}
+  .toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;margin-top:8px;cursor:pointer;font-weight:600;font-size:14.5px}
+  .toggle input{width:20px;height:20px;accent-color:var(--navy)}
+  .hint{font-size:13px;color:var(--muted);margin-top:6px}
+  .best{background:var(--gold-soft);border:1.5px solid #f3d99c;border-radius:16px;padding:10px 12px;margin-bottom:10px}
+  .best b{font-size:15px}
+  .best p{margin:2px 0 0;font-size:13.5px;color:#6a5524}
+  textarea#msg{min-height:270px;background:var(--green-soft);border-color:#bfe6cc;font-size:16px;line-height:1.85;resize:vertical}
+  .alts{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+  .alt{border:1.5px dashed var(--line);border-radius:14px;padding:9px 12px;background:#fff;cursor:pointer;text-align:right;font-family:inherit;color:var(--text);font-size:14.5px}
+  .alt.on{border-style:solid;border-color:var(--green);background:var(--green-soft)}
+  .alt small{display:block;color:var(--muted);font-size:12.5px}
+  .row{display:flex;gap:8px;margin-top:10px}
+  .btn{flex:1;border:none;border-radius:14px;padding:13px;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}
+  .btn.navy{background:var(--navy);color:#fff}
+  .btn.green{background:var(--green);color:#fff}
+  .btn.ghost{background:#eceff4;color:var(--text);margin-top:10px;width:100%}
+  details{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 16px;margin-bottom:14px}
+  summary{font-weight:800;cursor:pointer;font-size:16px}
+  details ul{margin:10px 0 0;padding-right:20px}
+  details li{margin-bottom:6px;font-size:14.5px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:10px 20px;border-radius:999px;font-weight:700;transition:.25s;z-index:9}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .hide{display:none!important}
+  .err{color:var(--red);font-size:13px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="glow"></div>
+  <h1>💬 رسايل واتساب الذكية</h1>
+  <p>اختار سبب التواصل وتفاصيل العميل ← تطلع لك أنسب رسالة بالسعودي جاهزة للإرسال</p>
+</header>
+
+<!-- ① سبب التواصل -->
+<section class="card">
+  <h2><span class="step">1</span> ليه بتتواصل مع العميل؟</h2>
+  <div class="reasons" id="reasons"></div>
+</section>
+
+<!-- ② تفاصيل العميل -->
+<section class="card">
+  <h2><span class="step">2</span> تفاصيل العميل</h2>
+
+  <div class="label">🙋 مين اللي بيرسل؟ <small>(يتحفظ على جهازك)</small></div>
+  <div class="chips" id="staffChips"></div>
+
+  <div class="label">👤 اسم العميل <small>(اختياري بس يفرق كثير)</small></div>
+  <input type="text" id="name" placeholder="مثلاً: حاتم">
+
+  <div class="label">🚻 العميل</div>
+  <div class="chips" id="gender"></div>
+
+  <div class="label">🏷️ طريقة المناداة</div>
+  <div class="chips" id="title"></div>
+
+  <div id="itemsBox">
+    <div class="label">🛍️ اشترى / مهتم بإيه؟ <small>(اختار أكثر من حاجة)</small></div>
+    <div class="chips" id="items"></div>
+  </div>
+
+  <div class="label" id="whenLabel">📅 متى آخر زيارة؟</div>
+  <div class="chips" id="when"></div>
+
+  <div id="obsBox">
+    <div class="label">🤔 إيه اللي وقّفه عن الشراء؟</div>
+    <div class="chips" id="obs"></div>
+  </div>
+
+  <label class="toggle"><input type="checkbox" id="offer"> 🎁 ضيف عرض «اشترِ واحدة والثانية مجاناً»</label>
+  <label class="toggle"><input type="checkbox" id="ins"> 🛡️ العميل عنده تأمين (أو ممكن يكون عنده)</label>
+</section>
+
+<!-- ③ الرسالة -->
+<section class="card">
+  <h2><span class="step">3</span> الرسالة</h2>
+  <div class="best" id="bestBox"><b id="bestTitle">⭐ اختار سبب التواصل الأول</b><p id="bestWhy">وأنا أختار لك أنسب رسالة على حسب حالة العميل</p></div>
+  <textarea id="msg" placeholder="الرسالة هتظهر هنا..."></textarea>
+  <div class="hint">✏️ تقدر تعدّل في النص قبل ما تبعته</div>
+
+  <div class="label">💡 رسايل بديلة لنفس الحالة</div>
+  <div class="alts" id="alts"></div>
+
+  <div class="label">📱 رقم واتساب العميل <small>(اختياري)</small></div>
+  <input type="tel" id="phone" placeholder="05xxxxxxxx" inputmode="tel">
+  <div class="err hide" id="phoneErr">⚠️ الرقم شكله ناقص، اتأكد منه</div>
+
+  <div class="row">
+    <button class="btn navy" id="copyBtn">📋 نسخ</button>
+    <a class="btn green" id="waBtn" href="https://wa.me/" target="_blank" rel="noopener">📤 ابعت واتساب</a>
+  </div>
+  <div class="hint">📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
+  <button class="btn ghost" id="resetBtn">🔄 عميل جديد</button>
+</section>
+
+<details>
+  <summary>⚙️ إعداداتك (تتحفظ على جهازك)</summary>
+  <div class="label">⭐ رابط تقييم قوقل للفرع <small>(متحط جاهز من QR الفرع، تقدر تغيّره)</small></div>
+  <input type="url" id="review" placeholder="https://..." dir="ltr">
+</details>
+
+<details>
+  <summary>🧠 قبل ما ترسل: ٦ قواعد ترفع الرد</summary>
+  <ul>
+    <li>⚡ <b>السرعة أهم شي:</b> ابعت خلال ٢٤ ساعة من الزيارة، كل ما تأخرت قلّ الاهتمام.</li>
+    <li>👤 <b>الاسم دايماً:</b> الرسالة اللي فيها اسم العميل ما تنقرى كأنها إعلان.</li>
+    <li>❓ <b>سؤال واحد بس في الآخر:</b> وسهل الرد عليه (تم / الصباح ولا المساء؟).</li>
+    <li>🎯 <b>سبب واضح للزيارة:</b> فحص مجاني، صيانة مجانية، نظارة جاهزة، عرض له مدة.</li>
+    <li>🔔 <b>متابعتين بالكثير:</b> لو ما رد، ابعت «تذكير خفيف» بعد ٢–٣ أيام، وبعدها «رسالة الختام» وخلاص.</li>
+    <li>🕰️ <b>الوقت:</b> بعد العصر للمغرب أو بعد العشاء، وتجنب وقت الصلاة وآخر الليل.</li>
+  </ul>
+</details>
+
+</div>
+<div class="toast" id="toast">تم النسخ ✅</div>
+
+<script>
+/* ============ البيانات ============ */
+const REASONS = [
+  {id:'et',    t:'👁️ فحص وما اشترى',     d:'سوّى فحص مجاني وطلع'},
+  {id:'price', t:'💬 سأل عن السعر وطلع',  d:'تردد بسبب السعر'},
+  {id:'ready', t:'📦 نظارته جاهزة',        d:'تذكير بالاستلام'},
+  {id:'after', t:'⭐ متابعة بعد الشراء',   d:'اطمئنان + تقييم'},
+  {id:'maint', t:'🔧 صيانة مجانية',        d:'تنظيف وضبط النظارة'},
+  {id:'back',  t:'🔁 عميل قديم',           d:'صار له فترة ما زارنا'},
+  {id:'offer', t:'🎁 عرض جديد',            d:'الثانية مجاناً'},
+  {id:'nudge', t:'🔔 ما رد علينا',         d:'متابعة ثانية خفيفة'}
+];
+const GENDER = [{id:'m',t:'👨 رجل'},{id:'f',t:'👩 امرأة'}];
+const TITLES = [{id:'ghali',t:'💛 الغالي / الغالية'},{id:'ustaz',t:'🎩 أستاذ / أستاذة'},{id:'none',t:'🙂 بدون لقب'}];
+const ITEMS  = [{id:'rx',t:'👓 نظارة طبية'},{id:'pal',t:'🔭 متعددة البؤر'},{id:'sun',t:'😎 شمسية'},{id:'cl',t:'💧 عدسات لاصقة'},{id:'photo',t:'🌈 عدسة تلوين'}];
+const WHEN   = [{id:'w',t:'أقل من أسبوع'},{id:'m1',t:'١–٤ أسابيع'},{id:'m6',t:'١–٦ شهور'},{id:'y1',t:'٦–١٢ شهر'},{id:'y2',t:'أكثر من سنة'}];
+const STAFF = [{id:'إيهاب',t:'إيهاب'},{id:'رزان',t:'رزان'},{id:'بدور',t:'بدور'},{id:'راما',t:'راما'},{id:'',t:'بدون اسم'}];
+const REVIEW_DEFAULT = 'https://qrcodes.pro/IaqVcK';
+const OBS    = [{id:'price',t:'💸 السعر'},{id:'think',t:'🤔 بيفكر / يستشير'},{id:'online',t:'🛒 بيشتري من برّا'},{id:'model',t:'🖼️ ما لقى موديل'},{id:'none',t:'🤷 مو واضح'}];
+
+/* ============ الحالة ============ */
+const S = {staff:'', reason:null, gender:'m', title:'ghali', items:new Set(), when:'w', obs:'none', alt:0};
+const $ = id => document.getElementById(id);
+function store(k,v){try{localStorage.setItem('wasmart_'+k,v)}catch(e){}}
+function load(k){try{return localStorage.getItem('wasmart_'+k)||''}catch(e){return ''}}
+
+/* ============ الواجهة ============ */
+function chips(el, list, key, multi){
+  el.innerHTML='';
+  list.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.textContent=o.t; b.type='button';
+    const isOn=()=> multi ? S[key].has(o.id) : S[key]===o.id;
+    if(isOn()) b.classList.add('on');
+    b.onclick=()=>{
+      if(multi){ S[key].has(o.id)?S[key].delete(o.id):S[key].add(o.id); }
+      else S[key]=o.id;
+      S.alt=-1; if(key==='staff') store('staff2',S.staff||'-'); chips(el,list,key,multi); render();
+    };
+    el.appendChild(b);
+  });
+}
+function drawReasons(){
+  const el=$('reasons'); el.innerHTML='';
+  REASONS.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='reason'+(S.reason===r.id?' on':''); b.type='button';
+    b.innerHTML=`<b>${r.t}</b><span>${r.d}</span>`;
+    b.onclick=()=>{
+      S.reason=r.id; S.alt=-1;
+      // افتراضات ذكية حسب السبب
+      if(r.id==='back' && (S.when==='w'||S.when==='m1')) S.when='y1';
+      if(r.id==='offer') $('offer').checked=true;
+      drawReasons(); chips($('when'),WHEN,'when'); render();
+    };
+    el.appendChild(b);
+  });
+}
+
+/* ============ أدوات الصياغة ============ */
+function ctx(){
+  const f = S.gender==='f';
+  const g = (m,w)=> f?w:m;
+  const name = $('name').value.trim();
+  const staff = S.staff;
+  const hour = new Date().getHours();
+  const tod = hour<12 ? 'صباح الخير' : 'مساء الخير';
+  let greet;
+  if(S.title==='ghali') greet = `هلا والله ${g('بالغالي','بالغالية')}${name?' '+name:''} ✨`;
+  else if(S.title==='ustaz') greet = name ? `${tod} ${g('أستاذ','أستاذة')} ${name} 🌷` : `${tod} 🌷`;
+  else greet = name ? `هلا ${name}، ${tod} 🌷` : `هلا والله، ${tod} 🌷`;
+  const me = staff ? `معك ${staff} من أوبتكال كلوب – تبوك بارك 👋` : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  const has = id => S.items.has(id);
+  const onlyCL = has('cl') && !has('rx') && !has('pal') && !has('sun') && !has('photo');
+  const onlySun = has('sun') && !has('rx') && !has('pal') && !has('cl') && !has('photo');
+  const item = has('pal') ? 'نظارتك المتعددة البؤر' : onlyCL ? 'عدساتك' : onlySun ? 'نظارتك الشمسية' : 'نظارتك';
+  const offer = $('offer').checked ? '🎁 وعندنا الحين عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳' : '';
+  const ins = $('ins').checked ? `🛡️ وإذا عندك تأمين، نشيّك لك على التغطية بدون أي التزام` : '';
+  const review = $('review').value.trim();
+  const recent = S.when==='w' || S.when==='m1';
+  const old = S.when==='y1' || S.when==='y2';
+  return {f,g,name,greet,me,has,onlyCL,onlySun,item,offer,ins,review,recent,old,when:S.when,obs:S.obs};
+}
+const J = arr => arr.filter(x=>x!==null && x!==undefined && x!=='').join('\n');
+
+function obsLine(c){
+  const {g}=c;
+  switch(c.obs){
+    case 'price':  return `💡 وإذا الميزانية تهمك، عندنا إطارات تبدأ من ١٩٩ ريال، والعدسة نختارها على حسب استخدامك عشان ما تدفع على شي ما ${g('تحتاجه','تحتاجينه')} 👌`;
+    case 'think':  return `خذ${g('','ي')} راحتك 🙏 وإذا ${g('حاب','حابة')} ${g('تجيب','تجيبين')} معك أحد من أهلك ياخذ رأيه، حياكم الله`;
+    case 'online': return `📏 ترى المقاس مو بس رقم؛ المسافة بين العينين وارتفاع العدسة يفرقون كثير في الراحة، وهذا نضبطه لك هنا على وجهك، ومعه صيانة مجانية بعدين 🔧`;
+    case 'model':  return `😍 وصلتنا موديلات جديدة، وودّي ${g('تمر','تمرين')} ${g('تشوفها','تشوفينها')} على وجهك، وأنا أختار لك اللي يناسب شكل وجهك`;
+    default: return '';
+  }
+}
+
+/* ============ مكتبة الرسايل ============ */
+function build(){
+  const c = ctx(); const {g}=c;
+  const ask = `${g('تحب','تحبين')} نحجز لك وقت؟ بس ${g('رد','ردي')} بـ «تم» وأنا أرتب لك ✅`;
+  const ampm = `متى يناسبك ${g('تمر','تمرين')} علينا؟ الصباح ولا المساء؟ 🕘🌙`;
+
+  switch(S.reason){
+
+  case 'et': {
+    const fresh = S.when==='w';
+    const stale = c.old || S.when==='m6';
+    const list = [
+      { t:'سؤال مباشر ولطيف', why:'سؤال واحد سهل يفتح الحوار بدل ما يحس إنها رسالة بيع، والأنسب لما الفحص قريب.',
+        x:J([c.greet, c.me, `تشرفنا بفحصك عندنا 👁️`, `حبيت أطمّن: ${g('لقيت','لقيتي')} النظارة اللي تناسب مقاسك ولا لسّا؟`, obsLine(c), c.offer, c.ins]) },
+      { t:'تذكير صحي + حجز', why:'يذكّره إن تأجيل النظارة له أثر حقيقي (صداع وإجهاد)، وينهي بخطوة سهلة للحجز.',
+        x:J([c.greet, c.me,
+          stale ? `صار لفحصك عندنا فترة، وودنا نعيده لك مجاناً قبل التفصيل عشان نتأكد إن المقاس ما تغيّر 👁️`
+                : `مقاسك من فحصك عندنا محفوظ وجاهز 📋`,
+          `ترى تأجيل النظارة مع مقاس مثل مقاسك ممكن يسبب صداع وإجهاد للعين مع الوقت، وما نبي هالشي لك 🙏`,
+          obsLine(c), c.offer, c.ins, ask]) },
+      { t:'قصيرة وخفيفة', why:'للعميل اللي ما يحب الرسايل الطويلة، تترك الباب مفتوح بدون ضغط.',
+        x:J([c.greet, `مقاسك من فحص أوبتكال كلوب – تبوك بارك محفوظ عندنا 👓`, c.offer, `متى ما ${g('جهزت','جهزتي')} حياك، ونكمّل لك على طول ✅`]) }
+    ];
+    return {list, best: fresh ? 0 : 1};
+  }
+
+  case 'price': {
+    const list = [
+      { t:'خيارات تناسب الميزانية', why:'يكسر انطباع «غالي» بأرقام واضحة ويعطيه سبب يرجع يشوف بنفسه.',
+        x:J([c.greet, c.me, `سعدنا بزيارتك 🌷`,
+          `حبيت أوضح لك إن عندنا إطارات تبدأ من ١٩٩ ريال، والعدسة نختارها على حسب استخدامك عشان ما تدفع على شي ما ${g('تحتاجه','تحتاجينه')} 👌`,
+          c.obs!=='price' ? obsLine(c) : '', c.offer, c.ins, `وش رايك ${g('تمر','تمرين')} نوريك الخيارات على الطبيعة؟ الصباح ولا المساء؟ 🕘🌙`]) },
+      { t:'الفرق اللي ما يبان', why:'يحوّل المقارنة من «السعر» لـ«القيمة»: جودة، تركيب دقيق، وصيانة مجانية بعد البيع.',
+        x:J([c.greet, c.me,
+          `عارف إن فيه محلات تبيع النظارة بسعر أقل، والفرق اللي ما يبان من أول نظرة: جودة العدسة، دقة التركيب على وجهك، وصيانة مجانية بعدين 🔧`,
+          `نظارة ${g('تلبسها','تلبسينها')} كل يوم تستاهل تكون مريحة 👓 ونقدر نختار لك خيار يناسب ميزانيتك`,
+          c.offer, c.ins, ask]) },
+      { t:'قصيرة بعرض', why:'لو العميل حساس للسعر، العرض لحاله سبب قوي للرجوع.',
+        x:J([c.greet, `من أوبتكال كلوب – تبوك بارك 👓`,
+          $('offer').checked ? `🎁 حبيت أبلغك إن عندنا عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳` : `عندنا إطارات تبدأ من ١٩٩ ريال، وفحص النظر مجاني 👁️`,
+          `${g('تحب','تحبين')} أحجز لك وقت؟ ✅`]) }
+    ];
+    return {list, best: c.obs==='online' ? 1 : 0};
+  }
+
+  case 'ready': {
+    const pal = c.has('pal') ? `👌 وبنعطيك كم نصيحة تسهّل عليك التعود على العدسة المتعددة البؤر في أول أيام` : '';
+    const upsell = $('offer').checked ? `😎 وعلى فكرة العرض شغال: الثانية مجاناً على منتجات مختارة، لو ${g('حاب','حابة')} ${g('تاخذ','تاخذين')} معها شمسية` : '';
+    const list = [
+      { t:'بشارة + ضبط على الوجه', why:'يحوّل الاستلام من «مرّ خذها» إلى خدمة: ضبط المقاس على وجهه، فيحس بقيمة الزيارة.',
+        x:J([c.greet, `🎉 بشارة حلوة: ${c.item} جاهزة للاستلام في أوبتكال كلوب – تبوك بارك ✨`,
+          c.onlyCL ? `حياك نسلمها لك ونتأكد إن كل شي تمام 👌` : `ودنا نسلمها لك بأنفسنا عشان نضبطها على وجهك ونتأكد إنك ${g('مرتاح','مرتاحة')} فيها ١٠٠٪`,
+          pal, upsell, ampm]) },
+      { t:'قصيرة ومباشرة', why:'للعميل المستعجل: معلومة واضحة وموعد مفتوح.',
+        x:J([c.greet, `${c.item} جاهزة ✅ حياك أي وقت يناسبك في أوبتكال كلوب – تبوك بارك 🌷`]) },
+      { t:'تذكير ثاني بالاستلام', why:'لو صار لها أيام ما استلمها، تذكير لطيف بدون إحراج.',
+        x:J([c.greet, c.me, `${c.item} لسّا محفوظة عندنا وتنتظرك 👓`,
+          `${g('مرّ','مرّي')} علينا متى ما ناسبك، وبنضبطها لك على وجهك في دقايق ✅`, upsell, ampm]) }
+    ];
+    return {list, best: c.recent ? 0 : 2};
+  }
+
+  case 'after': {
+    let tip = '';
+    if(c.has('pal')) tip = `💡 طبيعي أول أيام مع المتعددة البؤر تحتاج تعوّد بسيط: حرّك${g('','ي')} راسك بدل عيونك، و${g('خلك','خليك')} ${g('لابسها','لابستها')} باستمرار، ولو حسيت${g('','ي')} بأي شي حياك نعدّلها لك مجاناً`;
+    else if(c.has('cl')) tip = `💧 تذكير بسيط: لا ${g('تنام','تنامين')} بالعدسات، ونظّفها دايم بالمحلول، ولو حسيت${g('','ي')} بأي احمرار ${g('شيلها','شيليها')} وكلّمنا`;
+    else if(c.has('photo')) tip = `🌈 معلومة: عدسة التلوين تغمق مع الشمس وترجع شفافة داخل الأماكن المغلقة، وداخل السيارة ممكن ما تغمق كثير لأن الزجاج يحجب الأشعة`;
+    const rev = c.review ? `⭐ رابط التقييم:\n${c.review}` : '';
+    const list = [
+      { t:'اطمئنان بعد الشراء', why:'المتابعة في أول أيام تبني ثقة وتمنع الإرجاع، وتفتح الباب لشراء ثاني.',
+        x:J([c.greet, c.me, `حبيت أطمّن عليك: كيف ${c.item} معك؟ ${g('مرتاح','مرتاحة')} فيها؟ 😊`, tip,
+          `أي ملاحظة مهما كانت بسيطة ${g('قل','قولي')} لي، وحنا موجودين 🌷`]) },
+      { t:'طلب تقييم قوقل', why:'الطلب مع رابط مباشر يقلل الخطوات، فيرتفع احتمال إنه يكتب التقييم فعلاً.',
+        x:J([c.greet, c.me, `نتمنى إن ${c.item} عجبتك 🤍`,
+          `لو تجربتك معنا كانت حلوة، يسعدنا تقييمك على قوقل؛ ياخذ منك دقيقة ويفرق معنا كثير 🙏`, rev]) },
+      { t:'شكر + ترشيح', why:'يستخدم مبدأ ردّ الجميل: هدية مجانية لأهله وربعه، فيرجع العميل ويجيب غيره.',
+        x:J([c.greet, `شكراً لثقتك في أوبتكال كلوب – تبوك بارك 🤍`,
+          `تذكير: فحص النظر عندنا مجاني، والصيانة والتنظيف لنظارتك مجاناً متى ما احتجت 🔧`,
+          `ولو أحد من أهلك أو ربعك محتاج فحص أو نظارة، حياهم الله، ونهتم فيهم مثلك 🌷`, c.offer]) }
+    ];
+    return {list, best: S.when==='w' ? 0 : S.when==='m1' ? 1 : 2};
+  }
+
+  case 'maint': {
+    const exam = c.old ? `👁️ وبالمرة نسوي لك فحص نظر مجاني نتأكد إن مقاسك ما تغيّر` : '';
+    const list = [
+      { t:'دعوة صيانة مجانية', why:'سبب زيارة بدون أي تكلفة؛ وكل زيارة فرصة يشوف الجديد ويفكر في نظارة ثانية.',
+        x:J([c.greet, c.me, `${c.item} تستاهل شوية اهتمام 👓`,
+          `عندنا صيانة مجانية (إذا حالة النظارة تسمح): تنظيف العدسات، شد البراغي، وضبط الإطار على وجهك 🔧`,
+          exam, c.offer, `ما ياخذ وقت ✅ ${ampm}`]) },
+      { t:'قصيرة', why:'رسالة سريعة بقيمة واضحة.',
+        x:J([c.greet, `تذكير من أوبتكال كلوب – تبوك بارك: تنظيف وضبط ${c.item} عندنا مجاناً 🔧✨`, exam, `حياك أي وقت 🌷`]) }
+    ];
+    return {list, best:0};
+  }
+
+  case 'back': {
+    const cl = c.has('cl') ? `💧 وإذا عدساتك قرّبت تخلص، نجهّزها لك` : '';
+    const list = [
+      { t:'وحشتنا + فحص دوري', why:'يجمع بين الاهتمام الشخصي وسبب صحي (المقاس يتغير بدون ما نحس) وعرض مجاني.',
+        x:J([c.greet, c.me, `وحشتنا في الفرع 🌷`,
+          `صار لك فترة من آخر زيارة، وينصحون بفحص النظر بشكل دوري (كل سنة إلى سنتين) لأن المقاس ممكن يتغير بدون ما نحس 👁️`,
+          `الفحص عندنا مجاني، وكمان تنظيف وصيانة نظارتك مجاناً 🔧`, cl, c.offer, c.ins, ask]) },
+      { t:'العرض أول', why:'للعميل القديم اللي يحب الفرص: يبدأ بالعرض ويخلي الفحص هدية إضافية.',
+        x:J([c.greet, `من أوبتكال كلوب – تبوك بارك 👓`,
+          $('offer').checked ? `🎁 حبيت أبلغك قبل الكل: عندنا عرض اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳` : `🎁 وصلتنا موديلات جديدة وحبيت ${g('تكون','تكونين')} من أول اللي يشوفها`,
+          `و${g('تقدر تسوي','تقدرين تسوين')} فحص نظر مجاني بنفس الزيارة 👁️`, cl, ampm]) },
+      { t:'قصيرة', why:'تذكير خفيف بدون ضغط.',
+        x:J([c.greet, `من زمان ما شفناك في أوبتكال كلوب – تبوك بارك 🌷 فحص النظر والصيانة عندنا مجاناً، حياك أي وقت ✅`]) }
+    ];
+    return {list, best:0};
+  }
+
+  case 'offer': {
+    const what = c.has('sun') && !c.has('rx') && !c.has('pal') ? `فرصة ${g('تاخذ','تاخذين')} شمسية جديدة ومعها نظارة ثانية 😎👓`
+               : `فرصة ${g('تجدد','تجددين')} نظارتك و${g('تاخذ','تاخذين')} معها شمسية أو نظارة احتياط 😎👓`;
+    const list = [
+      { t:'العرض مع مدة', why:'العرض الواضح مع مدة محدودة يعطي سبب للتحرك الحين بدل «بعدين».',
+        x:J([c.greet, c.me, `عندنا لك خبر حلو 🎁`,
+          `اشترِ واحدة والثانية مجاناً على منتجات مختارة ✨`, what, `العرض لفترة محدودة ⏳`, c.ins, ampm]) },
+      { t:'شخصية أكثر', why:'يخلي العميل يحس إن الرسالة له هو مو رسالة جماعية.',
+        x:J([c.greet, c.me, `أول ما نزل العرض تذكرتك 😊`,
+          `اشترِ واحدة والثانية مجاناً على منتجات مختارة 🎁`, `${g('تحب','تحبين')} أجهّز لك كم موديل يناسبك قبل ما ${g('تجي','تجين')}؟ ✅`]) },
+      { t:'قصيرة', why:'للإرسال السريع.',
+        x:J([c.greet, `🎁 عرض أوبتكال كلوب – تبوك بارك: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳ حياك ✅`]) }
+    ];
+    return {list, best:0};
+  }
+
+  case 'nudge': {
+    const list = [
+      { t:'تذكير خفيف', why:'كثير من الناس يقرون الرسالة وينسون يردون؛ تذكير مهذب يرجعها قدامه.',
+        x:J([c.greet, `أعتذر على الإزعاج 🙏 بس حبيت أتأكد إن رسالتي وصلتك`,
+          `إذا الوقت ما يناسبك الحين ما عليه، ولو ${g('حاب','حابة')} نرتب لك زيارة بس ${g('قل','قولي')} «تم» ✅`]) },
+      { t:'سؤال اختيارين', why:'سؤال «هذا ولا هذا» أسهل في الرد من «متى تجي؟»، فيرفع احتمال الرد.',
+        x:J([c.greet, `سؤال سريع 👋`, `يناسبك ${g('تمر','تمرين')} علينا هالأسبوع ولا الأسبوع الجاي؟`, obsLine(c), c.offer]) },
+      { t:'رسالة الختام', why:'آخر رسالة بدون ضغط؛ غالباً تجيب رد لأنها تريح العميل وتترك الباب مفتوح.',
+        x:J([c.greet, `ما راح أطوّل عليك 🙏`, `حبيت أقول لك إن ملفك ومقاسك محفوظين عندنا في أوبتكال كلوب – تبوك بارك، ومتى ما احتجتنا حياك أي وقت 🌷`]) }
+    ];
+    return {list, best:0};
+  }
+  }
+  return null;
+}
+
+/* ============ العرض ============ */
+function render(){
+  const r = S.reason;
+  $('obsBox').classList.toggle('hide', !(r==='et'||r==='price'||r==='nudge'));
+  $('whenLabel').textContent = r==='et' ? '📅 متى سوّى الفحص؟' : r==='after' ? '📅 متى اشترى؟' : r==='ready' ? '📅 من متى جاهزة؟' : '📅 متى آخر زيارة؟';
+  const out = build();
+  const alts=$('alts'); alts.innerHTML='';
+  if(!out){ return; }
+  if(S.alt<0) S.alt=out.best;
+  const cur=out.list[S.alt]||out.list[0];
+  $('bestTitle').textContent = (S.alt===out.best ? '⭐ الأنسب: ' : '✍️ اخترت: ') + cur.t;
+  $('bestWhy').textContent = cur.why;
+  $('msg').value = cur.x;
+  out.list.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='alt'+(i===S.alt?' on':'');
+    b.innerHTML=`${i===out.best?'⭐ ':''}${o.t}<small>${o.why}</small>`;
+    b.onclick=()=>{S.alt=i; render();};
+    alts.appendChild(b);
+  });
+  updateWa();
+}
+
+function normPhone(v){
+  // تحويل الأرقام العربية
+  let d=(v||'').replace(/[٠-٩]/g,ch=>'٠١٢٣٤٥٦٧٨٩'.indexOf(ch)).replace(/[^\d]/g,'');
+  if(d.startsWith('00')) d=d.slice(2);
+  if(d.startsWith('05') && d.length===10) d='966'+d.slice(1);
+  else if(d.startsWith('5') && d.length===9) d='966'+d;
+  return d;
+}
+function updateWa(){
+  const raw=$('phone').value.trim();
+  const p=normPhone(raw);
+  const bad = raw && p.length<11;
+  $('phoneErr').classList.toggle('hide', !bad);
+  const txt=encodeURIComponent($('msg').value);
+  $('waBtn').href = (p && !bad) ? `https://wa.me/${p}?text=${txt}` : `https://wa.me/?text=${txt}`;
+}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
+
+$('copyBtn').onclick=async()=>{
+  const t=$('msg').value; if(!t) return toast('اختار سبب التواصل الأول');
+  try{ await navigator.clipboard.writeText(t); toast('تم النسخ ✅'); }
+  catch(e){ $('msg').select(); try{document.execCommand('copy');toast('تم النسخ ✅');}catch(_){toast('انسخ يدوي من المربع');} }
+};
+$('waBtn').addEventListener('click',e=>{ if(!$('msg').value){e.preventDefault();toast('اختار سبب التواصل الأول');} });
+$('resetBtn').onclick=()=>{
+  S.reason=null; S.items=new Set(); S.when='w'; S.obs='none'; S.alt=-1; S.title='ghali'; S.gender='m';
+  $('name').value=''; $('phone').value=''; $('offer').checked=false; $('ins').checked=false; $('msg').value='';
+  $('bestTitle').textContent='⭐ اختار سبب التواصل الأول'; $('bestWhy').textContent='وأنا أختار لك أنسب رسالة على حسب حالة العميل';
+  init(); window.scrollTo({top:0,behavior:'smooth'});
+};
+['name','review'].forEach(id=>$(id).addEventListener('input',()=>{ if(id==='review') store('review',$(id).value); render(); }));
+['offer','ins'].forEach(id=>$(id).addEventListener('change',()=>render()));
+$('msg').addEventListener('input',updateWa);
+$('phone').addEventListener('input',updateWa);
+
+function init(){
+  drawReasons();
+  chips($('staffChips'),STAFF,'staff');
+  chips($('gender'),GENDER,'gender');
+  chips($('title'),TITLES,'title');
+  chips($('items'),ITEMS,'items',true);
+  chips($('when'),WHEN,'when');
+  chips($('obs'),OBS,'obs');
+  $('alts').innerHTML='';
+  $('obsBox').classList.add('hide');
+}
+{const st=load('staff2'); S.staff = st==='-' ? '' : (st||'إيهاب');}
+$('review').value=load('review')||REVIEW_DEFAULT;
+init();
+</script>
+</body>
+</html>
