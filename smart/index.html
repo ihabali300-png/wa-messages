@@ -221,7 +221,7 @@ function drawStaff(){
   STAFF.forEach(n=>{
     const b=document.createElement('button'); b.type='button';
     b.className='chip'+((S.staff===n||(n==='بدون اسم'&&!S.staff))?' on':''); b.textContent=n;
-    b.onclick=()=>{S.staff = n==='بدون اسم' ? '' : n; store('staff3', S.staff||'-'); drawStaff(); render();};
+    b.onclick=()=>{const v = n==='بدون اسم' ? '' : n; S.staff = (S.staff===v && v!=='') ? '' : v; store('staff3', S.staff||'-'); drawStaff(); render();};
     el.appendChild(b);
   });
 }
@@ -231,7 +231,7 @@ function drawRtypes(){
     const b=document.createElement('button'); b.type='button';
     b.className='rtype'+(S.rtype===r.id?' on':'');
     b.innerHTML=`<b>${r.t}</b><span>${r.d}</span>`;
-    b.onclick=()=>{S.rtype=r.id; S.style=-1; drawRtypes(); render();};
+    b.onclick=()=>{S.rtype = S.rtype===r.id ? null : r.id; S.style=-1; drawRtypes(); render();};
     el.appendChild(b);
   });
 }
@@ -240,7 +240,7 @@ function drawTitles(){
   TITLES.forEach(o=>{
     const b=document.createElement('button'); b.type='button';
     b.className='chip'+(S.title===o.id?' on':''); b.textContent=o.t;
-    b.onclick=()=>{S.title=o.id; drawTitles(); render();};
+    b.onclick=()=>{S.title = S.title===o.id ? null : o.id; drawTitles(); render();};
     el.appendChild(b);
   });
 }
@@ -257,7 +257,7 @@ function drawItems(){
       if(a==='plus') S.items.set(o.id,q+1);
       else if(a==='minus'){ q<=1 ? S.items.delete(o.id) : S.items.set(o.id,q-1); }
       else if(!q) S.items.set(o.id,1);
-      else return;
+      else S.items.delete(o.id);
       S.style=-1; drawItems(); render();
     };
     el.appendChild(b);
@@ -271,7 +271,7 @@ function drawDate(){
     b.className='year'+(S.year===y?' on':'');
     b.innerHTML = active ? y : `${y}<span class="soon">soon</span>`;
     b.disabled=!active;
-    b.onclick=()=>{S.year=y; if(S.month!==null && isFuture(y,S.month)) S.month=null; S.style=-1; drawDate(); render();};
+    b.onclick=()=>{ if(S.year===y){S.year=null;S.month=null;} else {S.year=y; if(S.month!==null && isFuture(y,S.month)) S.month=null;} S.style=-1; drawDate(); render();};
     ye.appendChild(b);
   });
   const me=$('months'); me.innerHTML='';
@@ -281,7 +281,7 @@ function drawDate(){
     b.className='month'+(S.month===i?' on':'');
     b.textContent=`${i+1} ${m}`;
     b.disabled=isFuture(S.year,i);
-    b.onclick=()=>{S.month=i; S.style=-1; drawDate(); render();};
+    b.onclick=()=>{S.month = S.month===i ? null : i; S.style=-1; drawDate(); render();};
     me.appendChild(b);
   });
   const a=monthsAgo();
@@ -293,7 +293,7 @@ function agoText(a){ if(a===0) return 'هذا الشهر'; if(a===1) return 'ش�
 
 /* ============ أساسيات الصياغة ============ */
 function base(){
-  const T=TITLES.find(t=>t.id===S.title); const f=T.f;
+  const T=TITLES.find(t=>t.id===S.title); const f=T?T.f:false;
   const g=(m,w)=>f?w:m;
   const name=$('name').value.trim();
   const tod=new Date().getHours()<12?'صباح الخير':'مساء الخير';
@@ -401,6 +401,7 @@ function buildInv(){
 
 /* ============ رسايل تقييم قوقل ============ */
 function buildRev(){
+  if(!S.rtype) return null;
   const c=base(); const {g}=c; const st=S.staff;
   const me = st ? `معك ${st} من أوبتكال كلوب – تبوك بارك 👋` : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
   const link = `⭐ رابط التقييم (ياخذ أقل من دقيقة):\n${REVIEW_LINK}`;
