@@ -77,6 +77,19 @@
   .hide{display:none!important}
   kbd{background:#eceff4;border-radius:6px;padding:0 6px;font-family:inherit;font-size:12px}
 
+  .modes{display:flex;gap:6px;background:rgba(255,255,255,.08);padding:4px;border-radius:14px}
+  .mode{border:none;background:transparent;color:#fff;font-family:inherit;font-size:16px;font-weight:800;padding:8px 16px;border-radius:10px;cursor:pointer;opacity:.75}
+  .mode.on{background:#fff;color:var(--navy);opacity:1}
+  .item{position:relative}
+  .qty{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .qty b{min-width:18px;text-align:center;font-size:15px}
+  .qty span{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:17px;font-weight:800;line-height:1}
+  .badge{position:absolute;top:6px;left:8px;background:var(--gold);color:var(--navy);border-radius:999px;font-size:12px;font-weight:800;padding:0 7px}
+  .rtypes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .rtype{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px;text-align:right;cursor:pointer;font-family:inherit;color:var(--text)}
+  .rtype b{display:block;font-size:16px}
+  .rtype span{font-size:13px;color:var(--muted)}
+  .rtype.on{border-color:var(--navy);background:#eef2f9;box-shadow:inset 0 0 0 1px var(--navy)}
   @media (max-width:980px){
     .grid{grid-template-columns:1fr;padding:12px}
     .sticky{position:static}
@@ -92,30 +105,32 @@
 
 <div class="top">
   <div><h1>💬 رسايل واتساب الذكية <span class="sub">أوبتكال كلوب – تبوك بارك</span></h1></div>
-  <div class="staff"><span>🙋 المرسل:</span><div class="chips" id="staffChips"></div></div>
+  <div class="modes"><button class="mode on" id="modeInv" type="button">🧾 رسايل الفاتورة</button><button class="mode" id="modeRev" type="button">⭐ رسايل تقييم قوقل</button></div>
 </div>
 
 <div class="grid">
   <!-- العمود الأول: بيانات العميل -->
   <div class="col">
     <div class="card">
-      <div class="row2">
-        <div>
-          <h2>📱 رقم العميل <small>(الصقه من الداشبورد)</small></h2>
-          <input type="tel" id="phone" placeholder="05xxxxxxxx" inputmode="tel">
-          <div class="err hide" id="phoneErr">⚠️ الرقم شكله ناقص، اتأكد منه</div>
-        </div>
-        <div>
-          <h2>👤 اسم العميل <small>(اختياري)</small></h2>
-          <input type="text" id="name" placeholder="مثلاً: حاتم">
-        </div>
-      </div>
+      <h2>👤 اسم العميل <small>(اختياري)</small></h2>
+      <input type="text" id="name" placeholder="مثلاً: حاتم">
       <h2 style="margin-top:14px">🏷️ المناداة</h2>
       <div class="chips" id="titles"></div>
     </div>
 
+    <div id="revCards" class="hide" style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <h2>🙋 مين اللي خدم العميل؟ <small>(اسمه يظهر في الرسالة)</small></h2>
+        <div class="chips" id="staffChips"></div>
+      </div>
+      <div class="card">
+        <h2>⭐ نوع طلب التقييم</h2>
+        <div class="rtypes" id="rtypes"></div>
+      </div>
+    </div>
+    <div id="invCards" style="display:flex;flex-direction:column;gap:14px">
     <div class="card">
-      <h2>🧾 محتوى الفاتورة <small>(اختار كل اللي فيها)</small></h2>
+      <h2>🧾 محتوى الفاتورة <small>(اختار كل اللي فيها، و ＋ لو أكثر من قطعة)</small></h2>
       <div class="items" id="items"></div>
     </div>
 
@@ -125,13 +140,14 @@
       <div class="months" id="months"></div>
       <div class="ago" id="ago"></div>
     </div>
+    </div>
   </div>
 
   <!-- العمود الثاني: الرسالة -->
   <div class="col sticky">
     <div class="card">
       <h2>✉️ الرسالة</h2>
-      <div id="emptyBox" class="empty">🧾 اختار محتوى الفاتورة وتاريخها<br>والرسالة تطلع هنا جاهزة</div>
+      <div id="emptyBox" class="empty"><span id="emptyText"></span></div>
       <div id="msgBox" class="hide">
         <div class="tabs" id="tabs"></div>
         <div class="best"><b id="bestTitle"></b><p id="bestWhy"></p></div>
@@ -142,7 +158,7 @@
           <a class="btn green" id="waBtn" href="https://wa.me/" target="_blank" rel="noopener">📤 ابعت واتساب</a>
           <button class="btn ghost" id="resetBtn" title="عميل جديد">🔄 عميل جديد</button>
         </div>
-        <div class="hint">📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
+        <div class="hint">📤 هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
       </div>
     </div>
   </div>
@@ -164,22 +180,49 @@ const ITEMS  = [
   {id:'frame',i:'🔲', t:'إطار طبي فقط'},
   {id:'lens', i:'🔍', t:'عدسات طبية فقط'}
 ];
+const RTYPES = [
+  {id:'maint', t:'🔧 بعد صيانة مجانية', d:'سوّينا له صيانة ببلاش'},
+  {id:'serv',  t:'🛍️ بعد شراء أو خدمة', d:'ما لحقنا نطلب التقييم بالمحل'}
+];
+const REVIEW_LINK = 'https://qrcodes.pro/IaqVcK';
 const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const YEARS  = [2025, 2026, 2027];
 const ACTIVE_YEARS = [2025, 2026];
 
-const S = {staff:'إيهاب', title:'ghali', items:new Set(), year:null, month:null, style:-1};
+const S = {mode:'inv', staff:'إيهاب', title:'ghali', items:new Map(), year:null, month:null, rtype:'maint', style:-1};
 const $ = id => document.getElementById(id);
 function store(k,v){try{localStorage.setItem('wasmart_'+k,v)}catch(e){}}
 function load(k){try{return localStorage.getItem('wasmart_'+k)}catch(e){return null}}
 
 /* ============ الواجهة ============ */
+function setMode(m){
+  S.mode=m; S.style=-1;
+  $('modeInv').classList.toggle('on',m==='inv'); $('modeRev').classList.toggle('on',m==='rev');
+  $('invCards').style.display = m==='inv'?'flex':'none';
+  $('revCards').style.display = m==='rev'?'flex':'none';
+  $('revCards').classList.remove('hide');
+  $('emptyText').innerHTML = m==='inv' ? '🧾 اختار محتوى الفاتورة وتاريخها<br>والرسالة تطلع هنا جاهزة' : '⭐ اختار نوع طلب التقييم';
+  render();
+}
+$('modeInv').onclick=()=>setMode('inv');
+$('modeRev').onclick=()=>setMode('rev');
+
 function drawStaff(){
   const el=$('staffChips'); el.innerHTML='';
   STAFF.forEach(n=>{
     const b=document.createElement('button'); b.type='button';
     b.className='chip'+((S.staff===n||(n==='بدون اسم'&&!S.staff))?' on':''); b.textContent=n;
     b.onclick=()=>{S.staff = n==='بدون اسم' ? '' : n; store('staff3', S.staff||'-'); drawStaff(); render();};
+    el.appendChild(b);
+  });
+}
+function drawRtypes(){
+  const el=$('rtypes'); el.innerHTML='';
+  RTYPES.forEach(r=>{
+    const b=document.createElement('button'); b.type='button';
+    b.className='rtype'+(S.rtype===r.id?' on':'');
+    b.innerHTML=`<b>${r.t}</b><span>${r.d}</span>`;
+    b.onclick=()=>{S.rtype=r.id; S.style=-1; drawRtypes(); render();};
     el.appendChild(b);
   });
 }
@@ -195,15 +238,23 @@ function drawTitles(){
 function drawItems(){
   const el=$('items'); el.innerHTML='';
   ITEMS.forEach(o=>{
-    const b=document.createElement('button'); b.type='button';
-    b.className='item'+(S.items.has(o.id)?' on':'');
-    b.innerHTML=`<i>${o.i}</i>${o.t}`;
-    b.onclick=()=>{S.items.has(o.id)?S.items.delete(o.id):S.items.add(o.id); S.style=-1; drawItems(); render();};
+    const q=S.items.get(o.id)||0;
+    const b=document.createElement('div');
+    b.className='item'+(q?' on':''); b.setAttribute('role','button');
+    b.innerHTML=`${q>1?`<span class="badge">×${q}</span>`:''}<i>${o.i}</i>${o.t}`+
+      (q?`<div class="qty"><span data-a="minus">−</span><b>${q}</b><span data-a="plus">＋</span></div>`:'');
+    b.onclick=e=>{
+      const a=e.target.dataset && e.target.dataset.a;
+      if(a==='plus') S.items.set(o.id,q+1);
+      else if(a==='minus'){ q<=1 ? S.items.delete(o.id) : S.items.set(o.id,q-1); }
+      else if(!q) S.items.set(o.id,1);
+      else return;
+      S.style=-1; drawItems(); render();
+    };
     el.appendChild(b);
   });
 }
 function drawDate(){
-  const now=new Date(), cy=now.getFullYear(), cm=now.getMonth();
   const ye=$('years'); ye.innerHTML='';
   YEARS.forEach(y=>{
     const b=document.createElement('button'); b.type='button';
@@ -215,7 +266,7 @@ function drawDate(){
     ye.appendChild(b);
   });
   const me=$('months'); me.innerHTML='';
-  if(S.year===null){ me.innerHTML=''; $('ago').textContent='👆 اختار السنة الأول'; return; }
+  if(S.year===null){ $('ago').textContent='👆 اختار السنة الأول'; return; }
   MONTHS.forEach((m,i)=>{
     const b=document.createElement('button'); b.type='button';
     b.className='month'+(S.month===i?' on':'');
@@ -229,48 +280,50 @@ function drawDate(){
 }
 function isFuture(y,m){const n=new Date();return y>n.getFullYear()||(y===n.getFullYear()&&m>n.getMonth());}
 function monthsAgo(){ if(S.year===null||S.month===null) return null; const n=new Date(); return (n.getFullYear()*12+n.getMonth())-(S.year*12+S.month); }
-function agoText(a){ if(a===0) return 'هذا الشهر'; if(a===1) return 'شهر'; if(a===2) return 'شهرين'; if(a<=10) return `${a} شهور`; if(a<12) return `${a} شهر`; if(a===12) return 'سنة'; if(a<24) return `سنة و${a-12===1?' شهر':a-12===2?' شهرين':' '+(a-12)+' شهور'}`; return 'سنتين أو أكثر'; }
+function agoText(a){ if(a===0) return 'هذا الشهر'; if(a===1) return 'شهر'; if(a===2) return 'شهرين'; if(a<=10) return `${a} شهور`; if(a<12) return `${a} شهر`; if(a===12) return 'سنة'; if(a<24){const r=a-12; return 'سنة و'+(r===1?' شهر':r===2?' شهرين':' '+r+' شهور');} return 'سنتين أو أكثر'; }
 
-/* ============ محرك الصياغة ============ */
-function ctx(){
-  const T = TITLES.find(t=>t.id===S.title); const f=T.f;
+/* ============ أساسيات الصياغة ============ */
+function base(){
+  const T=TITLES.find(t=>t.id===S.title); const f=T.f;
   const g=(m,w)=>f?w:m;
   const name=$('name').value.trim();
-  const has=id=>S.items.has(id);
-  const a=monthsAgo();
-  const hour=new Date().getHours();
-  const tod=hour<12?'صباح الخير':'مساء الخير';
+  const tod=new Date().getHours()<12?'صباح الخير':'مساء الخير';
   let greet;
   if(S.title==='ghali')  greet=`هلا والله بالغالي${name?' '+name:''} ✨`;
   else if(S.title==='ghalia') greet=`هلا والله بالغالية${name?' '+name:''} ✨`;
   else greet = name ? `هلا ${name}، ${tod} 🌷` : `هلا والله، ${tod} 🌷`;
-  const me = S.staff ? `معك ${S.staff} من أوبتكال كلوب – تبوك بارك 👋` : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  return {f,g,name,greet};
+}
+const J = arr => arr.filter(Boolean).join('\n');
 
-  // نوع العميل حسب الفاتورة
-  const glasses = has('rx')||has('sun')||has('frame')||has('lens');   // عنده شي يحتاج صيانة
+/* ============ رسايل الفاتورة ============ */
+function ctx(){
+  const b=base(); const {g}=b;
+  const q=id=>S.items.get(id)||0, has=id=>q(id)>0;
+  const a=monthsAgo();
+  const me=`معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  const glassesN = q('rx')+q('sun')+q('frame')+q('lens');
+  const glasses = glassesN>0;
   const clUser  = has('cl')||has('sol');
-  const small   = !glasses && !clUser && (has('acc')||has('drops'));  // مشتريات بسيطة
-
-  // اسم الشي اللي اشتراه
+  const small   = !glasses && !clUser && (has('acc')||has('drops'));
+  const many = glassesN>1;
   let thing;
   if(has('rx')&&has('sun')) thing='نظاراتك';
-  else if(has('rx')) thing='نظارتك الطبية';
-  else if(has('sun')) thing='نظارتك الشمسية';
-  else if(has('frame')) thing='إطارك';
-  else if(has('lens')) thing='نظارتك';
+  else if(has('rx')) thing = q('rx')>1?'نظاراتك الطبية':'نظارتك الطبية';
+  else if(has('sun')) thing = q('sun')>1?'نظاراتك الشمسية':'نظارتك الشمسية';
+  else if(has('frame')) thing = q('frame')>1?'إطاراتك':'إطارك';
+  else if(has('lens')) thing = many?'نظاراتك':'نظارتك';
   else if(has('cl')) thing='عدساتك';
   else thing='مشترياتك';
-
-  // المرحلة الزمنية
+  const plural = many || thing==='عدساتك' || thing==='مشترياتك';
+  const pr = plural?'هم':'ها';          // معها / معهم
   const stage = a<=1 ? 'new' : a<=5 ? 'mid' : a<=11 ? 'late' : 'old';
-  return {f,g,name,has,a,greet,me,glasses,clUser,small,thing,stage};
+  return {...b,q,has,a,me,glasses,clUser,small,thing,plural,pr,stage,many};
 }
-
-/* سطور حسب محتوى الفاتورة */
 function itemLines(c){
-  const {g,has,stage}=c, L=[];
+  const {g,has,q,stage}=c, L=[];
   if(has('frame') && !has('rx') && !has('lens'))
-    L.push(`🔲 ولو ${g('حاب','حابة')} ${g('تركّب','تركّبين')} عدسات طبية على إطارك، نقيس لك ونركّبها بدقة على وجهك`);
+    L.push(`🔲 ولو ${g('حاب','حابة')} ${g('تركّب','تركّبين')} عدسات طبية على ${q('frame')>1?'إطاراتك':'إطارك'}، نقيس لك ونركّبها بدقة على وجهك`);
   if(has('lens') && !has('rx') && !has('frame'))
     L.push(`🔍 وإذا ${g('تفكر','تفكرين')} ${g('تجدد','تجددين')} الإطار، وصلتنا موديلات جديدة والعرض فرصة ممتازة`);
   if(has('cl') && stage!=='new')
@@ -280,64 +333,53 @@ function itemLines(c){
   if(has('drops'))
     L.push(`💦 ولو ${g('تحس','تحسين')} بجفاف مستمر في العين، الفحص عندنا مجاني ونطمّن على عيونك`);
   if(has('sun') && !has('rx') && !has('frame') && !has('lens'))
-    L.push(`😎 وتقدر${g('','ين')} ${g('تاخذ','تاخذين')} مع العرض نظارة طبية أو شمسية ثانية`);
+    L.push(`😎 و${g('تقدر تاخذ','تقدرين تاخذين')} مع العرض نظارة طبية أو شمسية ثانية`);
   return L;
 }
-
-/* المزايا الثلاث مرتبة حسب العميل */
 function perks(c){
-  const {g,glasses,clUser,small}=c;
-  const maint = `🔧 صيانة مجانية ${c.has('rx')||c.has('sun')||c.has('frame')||c.has('lens')?'ل'+c.thing:'لنظارتك'} (تنظيف وشد وضبط)، ولعملائنا الأولوية`;
+  const maint = `🔧 صيانة مجانية ل${c.glasses?c.thing:'نظارتك'} (تنظيف وشد وضبط)، ولعملائنا الأولوية`;
   const exam  = `👁️ فحص نظر مجاني`;
   const offer = `🎁 عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳`;
-  if(glasses) return [maint, offer, exam];
-  if(clUser)  return [exam, offer, maint];
-  if(small)   return [offer, exam, maint];
+  if(c.glasses) return [maint, offer, exam];
+  if(c.clUser)  return [exam, offer, maint];
+  if(c.small)   return [offer, exam, maint];
   return [offer, maint, exam];
 }
-
 function opening(c){
-  const {g,stage,thing,a}=c;
+  const {g,stage,thing,pr}=c;
   switch(stage){
-    case 'new':  return `شكراً لثقتك فينا 🤍 حبيت أطمّن عليك: ${thing} ${g('عاجبتك','عاجبتك')}؟ ${g('مرتاح','مرتاحة')} معها؟`;
+    case 'new':  return `شكراً لثقتك فينا 🤍 حبيت أطمّن عليك: ${thing} عاجبتك؟ ${g('مرتاح','مرتاحة')} مع${pr}؟`;
     case 'mid':  return `صار ل${thing} معك كم شهر، وحبيت أذكّرك بمزايا خاصة لك ${g('كعميل','كعميلة')} عندنا 🌟`;
-    case 'late': return `قرّبت سنة على زيارتك، وحبيت أذكّرك إن عندنا لك مزايا تستاهل تمر عشانها 🌟`;
+    case 'late': return `قرّبت سنة على زيارتك، وحبيت أذكّرك إن عندنا لك مزايا تستاهل ${g('تمر','تمرين')} عشانها 🌟`;
     default:     return `وحشتنا والله 🌷 صار لك فترة ما زرتنا، وعندنا لك مزايا خاصة ${g('كعميل','كعميلة')} عندنا`;
   }
 }
 function examNote(c){
-  const {stage,has}=c;
-  if(stage==='old' || stage==='late'){
-    if(has('cl')) return `👁️ ولابسي العدسات اللاصقة ينصح لهم بفحص سنوي، والفحص عندنا مجاني`;
+  if(c.stage==='old' || c.stage==='late'){
+    if(c.has('cl')) return `👁️ ولابسي العدسات اللاصقة ينصح لهم بفحص سنوي، والفحص عندنا مجاني`;
     if(c.glasses) return `👁️ وينصحون بفحص النظر بشكل دوري لأن المقاس ممكن يتغير بدون ما نحس`;
   }
   return '';
 }
-const J = arr => arr.filter(Boolean).join('\n');
-
-function build(){
+function buildInv(){
   if(!S.items.size || monthsAgo()===null) return null;
   const c=ctx(); const {g}=c;
   const P=perks(c);
   const ampm=`متى يناسبك ${g('تمر','تمرين')} علينا؟ الصباح ولا المساء؟ 🕘🌙`;
-  const ask =`${g('تحب','تحبين')} نحجز لك وقت؟ ${g('رد','ردي')} بـ «تم» وأنا أرتب لك ✅`;
-  const cta = c.stage==='new' ? `وأي ملاحظة مهما كانت بسيطة ${g('قل','قولي')} لي 🌷` : (c.stage==='old'?ask:ampm);
-
-  const full = J([c.greet, c.me, opening(c), '', ...P, '', ...itemLines(c), examNote(c), cta]);
-
+  const ask =`${g('تحب','تحبين')} نحجز لك وقت؟ ${g('رد','ردي')} بـ «تم» ونرتب لك ✅`;
+  const cta = c.stage==='new' ? `وأي ملاحظة مهما كانت بسيطة ${g('قل','قولي')} لنا 🌷` : (c.stage==='old'?ask:ampm);
+  const full = J([c.greet, c.me, opening(c), ...P, ...itemLines(c), examNote(c), cta]);
   const short = J([c.greet, c.me,
     c.stage==='new' ? `شكراً لثقتك فينا 🤍` : `حبيت أذكّرك بمزاياك عندنا:`,
     `${P[0].split('،')[0]} • 👁️ فحص مجاني • 🎁 الثانية مجاناً`,
     `حياك أي وقت ✅`]);
-
   const warm = J([c.greet, c.me,
     c.stage==='new' ? `حبيت أقول لك تشرفنا فيك 🤍 وأي وقت ${g('تحتاج','تحتاجين')} شي في ${c.thing} حنا موجودين`
-                    : `تذكرتك وحبيت أطمّن عليك 😊 كيف ${c.thing} معك؟`,
-    c.glasses ? `🔧 ${g('مرّ','مرّي')} علينا نسوي لها تنظيف وضبط مجاني، ولعملائنا الأولوية`
-              : `👁️ وتقدر${g('','ين')} تسوي فحص نظر مجاني أي وقت`,
+                    : `تذكرناك وحبينا نطمّن عليك 😊 كيف ${c.thing} معك؟`,
+    c.glasses ? `🔧 ${g('مرّ','مرّي')} علينا نسوي ل${c.pr} تنظيف وضبط مجاني، ولعملائنا الأولوية`
+              : `👁️ و${g('تقدر تسوي','تقدرين تسوين')} فحص نظر مجاني أي وقت`,
     `🎁 والحين عندنا عرض الثانية مجاناً على منتجات مختارة`,
     ...itemLines(c).slice(0,1), ampm]);
-
   const whyFull = c.glasses ? 'تبدأ بالصيانة المجانية لأنها أقرب سبب يخليه يمر بنظارته، وبعدها العرض والفحص.'
                : c.clUser ? 'تبدأ بالفحص المجاني لأنه الأهم لعميل العدسات اللاصقة، وبعدها العرض.'
                : 'تبدأ بالعرض لأنه أقوى سبب للزيارة لعميل مشترياته بسيطة.';
@@ -348,9 +390,43 @@ function build(){
   ];
 }
 
+/* ============ رسايل تقييم قوقل ============ */
+function buildRev(){
+  const c=base(); const {g}=c; const st=S.staff;
+  const me = st ? `معك ${st} من أوبتكال كلوب – تبوك بارك 👋` : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  const link = `⭐ رابط التقييم (ياخذ أقل من دقيقة):\n${REVIEW_LINK}`;
+  const mention = st ? `ولو ${g('تذكر','تذكرين')} اسمي «${st}» في التقييم، تسعدني والله 🤍` : '';
+  const steps = J([`١- ${g('افتح','افتحي')} الرابط 👆`, `٢- ${g('اختار','اختاري')} عدد النجوم ⭐`, `٣- ${g('اكتب','اكتبي')} جملة بسيطة عن تجربتك ✍️`]);
+  let main, short, step, why;
+  if(S.rtype==='maint'){
+    main = J([c.greet, me,
+      `سعدنا نخدمك في صيانة نظارتك 🔧 ونتمنى إنها صارت مريحة مثل أول ✨`,
+      `لو عجبتك الخدمة، تقييمك على قوقل يفرق معنا كثير ويساعد غيرك يعرفنا 🙏`,
+      link, mention]);
+    short = J([c.greet, `سعدنا بخدمتك في صيانة نظارتك 🔧`, `${g('تقدر تساعدنا','تقدرين تساعدينا')} بتقييم بسيط على قوقل؟ 🙏`, REVIEW_LINK]);
+    why = 'تربط التقييم بخدمة مجانية لسه عاملينها له، فيحس إن التقييم رد جميل بسيط.';
+  } else {
+    main = J([c.greet, me,
+      `شكراً لزيارتك لنا 🤍 كان ودّي أطلب منك هذا بالمحل بس ما لحق الوقت 😅`,
+      `رأيك يهمنا كثير، ولو تجربتك معنا كانت حلوة يسعدنا تقييمك على قوقل 🙏`,
+      link, mention]);
+    short = J([c.greet, `شكراً لزيارتك لأوبتكال كلوب – تبوك بارك 🤍`, `يسعدنا رأيك بتقييم سريع على قوقل 🙏`, REVIEW_LINK]);
+    why = 'تعتذر بلطف إننا ما طلبناه بالمحل، فتطلع طبيعية ومو رسالة جماعية.';
+  }
+  step = J([c.greet, me,
+    S.rtype==='maint' ? `شكراً إنك ${g('اخترتنا','اخترتينا')} لصيانة نظارتك 🔧` : `شكراً لزيارتك لنا 🤍`,
+    `لو ${g('تقدر','تقدرين')} ${g('تدعمنا','تدعمينا')} بتقييم على قوقل، هذي الطريقة بثلاث خطوات بس:`,
+    steps, REVIEW_LINK, mention]);
+  return [
+    {t:'⭐ الأنسب', why, x:main},
+    {t:'⚡ قصيرة', why:'سطرين ورابط، للعميل المستعجل.', x:short},
+    {t:'🪜 خطوة بخطوة', why:'تشرح له الخطوات، مناسبة لكبار السن أو اللي ما جرّب يقيّم قبل.', x:step}
+  ];
+}
+
 /* ============ العرض ============ */
 function render(){
-  const out=build();
+  const out = S.mode==='inv' ? buildInv() : buildRev();
   $('emptyBox').classList.toggle('hide', !!out);
   $('msgBox').classList.toggle('hide', !out);
   if(!out) return;
@@ -368,19 +444,7 @@ function render(){
   $('msg').value=cur.x;
   updateWa();
 }
-function normPhone(v){
-  let d=(v||'').replace(/[٠-٩]/g,ch=>'٠١٢٣٤٥٦٧٨٩'.indexOf(ch)).replace(/[^\d]/g,'');
-  if(d.startsWith('00')) d=d.slice(2);
-  if(d.startsWith('05') && d.length===10) d='966'+d.slice(1);
-  else if(d.startsWith('5') && d.length===9) d='966'+d;
-  return d;
-}
-function updateWa(){
-  const raw=$('phone').value.trim(), p=normPhone(raw), bad=raw && p.length<11;
-  $('phoneErr').classList.toggle('hide', !bad);
-  const txt=encodeURIComponent($('msg').value);
-  $('waBtn').href=(p&&!bad)?`https://wa.me/${p}?text=${txt}`:`https://wa.me/?text=${txt}`;
-}
+function updateWa(){ $('waBtn').href=`https://wa.me/?text=${encodeURIComponent($('msg').value)}`; }
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
 
 $('copyBtn').onclick=async()=>{
@@ -389,16 +453,15 @@ $('copyBtn').onclick=async()=>{
   catch(e){$('msg').select();try{document.execCommand('copy');toast('تم النسخ ✅');}catch(_){toast('انسخ يدوي من المربع');}}
 };
 $('resetBtn').onclick=()=>{
-  S.title='ghali'; S.items=new Set(); S.month=null; S.style=-1;
-  $('name').value=''; $('phone').value=''; $('msg').value='';
-  drawTitles(); drawItems(); drawDate(); render(); $('phone').focus();
+  S.title='ghali'; S.items=new Map(); S.month=null; S.style=-1;
+  $('name').value=''; $('msg').value='';
+  drawTitles(); drawItems(); drawDate(); render(); $('name').focus();
 };
 $('name').addEventListener('input',render);
-$('phone').addEventListener('input',updateWa);
 $('msg').addEventListener('input',updateWa);
 
 {const st=load('staff3'); if(st!==null) S.staff = st==='-'?'':st;}
-drawStaff(); drawTitles(); drawItems(); drawDate(); render();
+drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
 </script>
 </body>
 </html>
