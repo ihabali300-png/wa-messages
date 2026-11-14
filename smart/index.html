@@ -173,7 +173,7 @@
         <div class="hint">✏️ تقدر تعدّل في النص قبل ما تبعته</div>
         <div class="actions">
           <button class="btn navy" id="copyBtn">📋 نسخ</button>
-          <a class="btn green" id="waBtn" href="https://wa.me/" target="_blank" rel="noopener">📤 ابعت واتساب</a>
+          <a class="btn green" id="waBtn" href="https://api.whatsapp.com/send" target="_blank" rel="noopener">📤 ابعت واتساب</a>
           <button class="btn ghost" id="resetBtn" title="عميل جديد">🔄 عميل جديد</button>
         </div>
         <div class="hint" id="waHint">📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
@@ -474,7 +474,7 @@ function updateWa(){
   const raw=$('phone').value.trim(), p=normPhone(raw), bad=raw && p.length<11;
   $('phoneErr').classList.toggle('hide', !bad);
   const txt=encodeURIComponent($('msg').value);
-  $('waBtn').href=(p&&!bad)?`https://wa.me/${p}?text=${txt}`:`https://wa.me/?text=${txt}`;
+  $('waBtn').href=(p&&!bad)?`https://api.whatsapp.com/send?phone=${p}&text=${txt}`:`https://api.whatsapp.com/send?text=${txt}`;
   $('waHint').textContent = (p&&!bad) ? '📤 هيفتح محادثة العميل في واتساب الفرع والرسالة مكتوبة، اضغط إرسال بس' : '📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال';
 }
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
