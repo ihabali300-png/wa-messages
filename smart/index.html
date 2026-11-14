@@ -82,7 +82,9 @@
   .hide{display:none!important}
   kbd{background:#eceff4;border-radius:6px;padding:0 6px;font-family:inherit;font-size:12px}
 
-  .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .modes{display:grid;grid-template-columns:1fr 1fr auto;gap:10px}
+  .newTop{border:2px solid var(--line);background:#fff;color:var(--text);font-family:inherit;font-size:16px;font-weight:800;padding:12px 16px;border-radius:14px;cursor:pointer}
+  .newTop:hover{border-color:var(--navy2);background:#eef2f9}
   .mode{border:2px solid var(--navy);background:#fff;color:var(--navy);font-family:inherit;font-size:17px;font-weight:800;padding:12px;border-radius:14px;cursor:pointer;animation:pulse 1.6s ease-in-out infinite}
   .mode.on{background:var(--navy);color:#fff;animation:none;box-shadow:none}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,180,74,0);border-color:var(--navy)}50%{box-shadow:0 0 0 4px rgba(232,180,74,.35),0 0 18px rgba(232,180,74,.7);border-color:var(--gold)}}
@@ -118,7 +120,7 @@
 <div class="grid">
   <!-- العمود الأول: بيانات العميل -->
   <div class="col">
-    <div class="modes"><button class="mode on" id="modeInv" type="button">🧾 رسايل الفاتورة</button><button class="mode" id="modeRev" type="button">⭐ رسايل تقييم قوقل</button></div>
+    <div class="modes"><button class="mode on" id="modeInv" type="button">🧾 رسايل الفاتورة</button><button class="mode" id="modeRev" type="button">⭐ رسايل تقييم قوقل</button><button class="newTop" id="resetTop" type="button" title="عميل جديد">🔄 عميل جديد</button></div>
     <div class="card">
       <div class="row2">
         <div>
@@ -508,11 +510,13 @@ $('copyBtn').onclick=async()=>{
   try{await navigator.clipboard.writeText(t);toast('تم النسخ ✅');}
   catch(e){$('msg').select();try{document.execCommand('copy');toast('تم النسخ ✅');}catch(_){toast('انسخ يدوي من المربع');}}
 };
-$('resetBtn').onclick=()=>{
+function resetAll(){
   S.title='ghali'; S.items=new Map(); S.month=null; S.noInv=false; applyNoInv(); S.style=-1;
   $('name').value=''; $('phone').value=''; $('msg').value='';
   drawTitles(); drawItems(); drawDate(); render(); $('name').focus();
-};
+  window.scrollTo({top:0,behavior:'smooth'}); toast('عميل جديد ✨');
+}
+$('resetBtn').onclick=resetAll; $('resetTop').onclick=resetAll;
 $('name').addEventListener('input',render);
 $('noInv').onclick=()=>{S.noInv=!S.noInv; S.style=-1; applyNoInv(); render();};
 $('msg').addEventListener('input',updateWa);
