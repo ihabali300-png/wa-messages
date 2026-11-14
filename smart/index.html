@@ -139,7 +139,7 @@
 
     <div id="revCards" class="hide" style="display:flex;flex-direction:column;gap:14px">
       <div class="card">
-        <h2>🙋 مين اللي خدم العميل؟ <small>(اسمه يظهر في الرسالة)</small></h2>
+        <h2>🙋 مين اللي خدم العميل؟ <small>(اختار واحد أو أكثر)</small></h2>
         <div class="chips" id="staffChips"></div>
       </div>
       <div class="card">
@@ -191,7 +191,7 @@
 
 <script>
 /* ============ البيانات ============ */
-const STAFF  = ['إيهاب','رزان','بدور','راما','بدون اسم'];
+const STAFF  = [{id:'إيهاب',t:'إيهاب'},{id:'رزان',t:'رزان'},{id:'بدور',t:'بدور'},{id:'راما',t:'راما'},{id:'د. خواطر',t:'Dr. خواطر'},{id:'',t:'بدون اسم'}];
 const TITLES = [{id:'ghali',f:false,t:'👨 الغالي'},{id:'ghalia',f:true,t:'👩 الغالية'},{id:'nm',f:false,t:'👨 بدون لقب'},{id:'nf',f:true,t:'👩 بدون لقب'}];
 const ITEMS  = [
   {id:'rx',   i:'👓', t:'نظارة طبية'},
@@ -212,7 +212,7 @@ const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','
 const YEARS  = [2024, 2025, 2026, 2027];
 const ACTIVE_YEARS = [2024, 2025, 2026];
 
-const S = {mode:'inv', staff:'إيهاب', title:'ghali', items:new Map(), year:null, month:null, rtype:'maint', noInv:false, style:-1};
+const S = {mode:'inv', staff:['إيهاب'], title:'ghali', items:new Map(), year:null, month:null, rtype:'maint', noInv:false, style:-1};
 const $ = id => document.getElementById(id);
 function store(k,v){try{localStorage.setItem('wasmart_'+k,v)}catch(e){}}
 function load(k){try{return localStorage.getItem('wasmart_'+k)}catch(e){return null}}
@@ -234,8 +234,13 @@ function drawStaff(){
   const el=$('staffChips'); el.innerHTML='';
   STAFF.forEach(n=>{
     const b=document.createElement('button'); b.type='button';
-    b.className='chip'+((S.staff===n||(n==='بدون اسم'&&!S.staff))?' on':''); b.textContent=n;
-    b.onclick=()=>{const v = n==='بدون اسم' ? '' : n; S.staff = (S.staff===v && v!=='') ? '' : v; store('staff3', S.staff||'-'); drawStaff(); render();};
+    const on = n.id ? S.staff.includes(n.id) : !S.staff.length;
+    b.className='chip'+(on?' on':''); b.innerHTML = n.t.startsWith('Dr') ? `<span style="display:inline-flex;direction:ltr;gap:4px"><span>Dr.</span><span>خواطر</span></span>` : n.t;
+    b.onclick=()=>{
+      if(!n.id) S.staff=[];
+      else S.staff = S.staff.includes(n.id) ? S.staff.filter(x=>x!==n.id) : [...S.staff, n.id];
+      store('staff4', S.staff.join('|')||'-'); drawStaff(); render();
+    };
     el.appendChild(b);
   });
 }
@@ -437,10 +442,14 @@ function applyNoInv(){
 /* ============ رسايل تقييم قوقل ============ */
 function buildRev(){
   if(!S.rtype) return null;
-  const c=base(); const {g}=c; const st=S.staff;
-  const me = st ? `معك ${st} من أوبتكال كلوب – تبوك بارك 👋` : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  const c=base(); const {g}=c; const L=S.staff; const st=L.length;
+  const andJoin = a => a.length<2 ? (a[0]||'') : a.slice(0,-1).join('، ')+' و'+a[a.length-1];
+  const me = st===1 ? `معك ${L[0]} من أوبتكال كلوب – تبوك بارك 👋`
+           : st>1 ? `معك فريق أوبتكال كلوب – تبوك بارك (${andJoin(L)}) 👋`
+           : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
   const link = `⭐ رابط التقييم (ياخذ أقل من دقيقة):\n${REVIEW_LINK}`;
-  const mention = st ? `ولو ${g('تذكر','تذكرين')} اسمي «${st}» في التقييم، تسعدني والله 🤍` : '';
+  const mention = st===1 ? `ولو ${g('تذكر','تذكرين')} اسمي «${L[0]}» في التقييم، تسعدني والله 🤍`
+                : st>1 ? `ولو ${g('تذكر','تذكرين')} أسماءنا ${andJoin(L.map(x=>'«'+x+'»'))} في التقييم، تسعدنا والله 🤍` : '';
   const steps = J([`١- ${g('افتح','افتحي')} الرابط 👆`, `٢- ${g('اختار','اختاري')} عدد النجوم ⭐`, `٣- ${g('اكتب','اكتبي')} جملة بسيطة عن تجربتك ✍️`]);
   let main, short, step, why;
   if(S.rtype==='maint'){
@@ -522,7 +531,7 @@ $('noInv').onclick=()=>{S.noInv=!S.noInv; S.style=-1; applyNoInv(); render();};
 $('msg').addEventListener('input',updateWa);
 $('phone').addEventListener('input',updateWa);
 
-{const st=load('staff3'); if(st!==null) S.staff = st==='-'?'':st;}
+{const st=load('staff4'); if(st!==null) S.staff = st==='-'?[]:st.split('|');}
 drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
 </script>
 </body>
