@@ -120,8 +120,17 @@
   <div class="col">
     <div class="modes"><button class="mode on" id="modeInv" type="button">🧾 رسايل الفاتورة</button><button class="mode" id="modeRev" type="button">⭐ رسايل تقييم قوقل</button></div>
     <div class="card">
-      <h2>👤 اسم العميل <small>(اختياري)</small></h2>
-      <input type="text" id="name" placeholder="مثلاً: حاتم">
+      <div class="row2">
+        <div>
+          <h2>👤 اسم العميل <small>(اختياري)</small></h2>
+          <input type="text" id="name" placeholder="مثلاً: حاتم">
+        </div>
+        <div>
+          <h2>📱 رقم العميل <small>(يفتح محادثته على طول)</small></h2>
+          <input type="tel" id="phone" placeholder="05xxxxxxxx" inputmode="tel" dir="ltr" style="text-align:right">
+          <div class="err hide" id="phoneErr">⚠️ الرقم شكله ناقص، اتأكد منه</div>
+        </div>
+      </div>
       <h2 style="margin-top:14px">🏷️ المناداة</h2>
       <div class="chips" id="titles"></div>
     </div>
@@ -167,7 +176,7 @@
           <a class="btn green" id="waBtn" href="https://wa.me/" target="_blank" rel="noopener">📤 ابعت واتساب</a>
           <button class="btn ghost" id="resetBtn" title="عميل جديد">🔄 عميل جديد</button>
         </div>
-        <div class="hint">📤 هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
+        <div class="hint" id="waHint">📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال</div>
       </div>
     </div>
   </div>
@@ -454,7 +463,20 @@ function render(){
   $('msg').value=cur.x;
   updateWa();
 }
-function updateWa(){ $('waBtn').href=`https://wa.me/?text=${encodeURIComponent($('msg').value)}`; }
+function normPhone(v){
+  let d=(v||'').replace(/[٠-٩]/g,ch=>'٠١٢٣٤٥٦٧٨٩'.indexOf(ch)).replace(/[^\d]/g,'');
+  if(d.startsWith('00')) d=d.slice(2);
+  if(d.startsWith('05') && d.length===10) d='966'+d.slice(1);
+  else if(d.startsWith('5') && d.length===9) d='966'+d;
+  return d;
+}
+function updateWa(){
+  const raw=$('phone').value.trim(), p=normPhone(raw), bad=raw && p.length<11;
+  $('phoneErr').classList.toggle('hide', !bad);
+  const txt=encodeURIComponent($('msg').value);
+  $('waBtn').href=(p&&!bad)?`https://wa.me/${p}?text=${txt}`:`https://wa.me/?text=${txt}`;
+  $('waHint').textContent = (p&&!bad) ? '📤 هيفتح محادثة العميل في واتساب الفرع والرسالة مكتوبة، اضغط إرسال بس' : '📤 من غير رقم: هيفتح الواتساب وتختار العميل من جهات الاتصال';
+}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1600);}
 
 $('copyBtn').onclick=async()=>{
@@ -464,11 +486,12 @@ $('copyBtn').onclick=async()=>{
 };
 $('resetBtn').onclick=()=>{
   S.title='ghali'; S.items=new Map(); S.month=null; S.style=-1;
-  $('name').value=''; $('msg').value='';
+  $('name').value=''; $('phone').value=''; $('msg').value='';
   drawTitles(); drawItems(); drawDate(); render(); $('name').focus();
 };
 $('name').addEventListener('input',render);
 $('msg').addEventListener('input',updateWa);
+$('phone').addEventListener('input',updateWa);
 
 {const st=load('staff3'); if(st!==null) S.staff = st==='-'?'':st;}
 drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
