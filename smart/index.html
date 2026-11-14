@@ -147,7 +147,10 @@
     </div>
     <div id="invCards" style="display:flex;flex-direction:column;gap:14px">
     <div class="card">
-      <h2>🧾 محتوى الفاتورة <small>(اختار كل اللي فيها، و ＋ لو أكثر من قطعة)</small></h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px">
+        <h2 style="margin:0">🧾 محتوى الفاتورة <small>(اختار كل اللي فيها، و ＋ لو أكثر من قطعة)</small></h2>
+        <button type="button" class="chip" id="noInv">📭 ما له فاتورة</button>
+      </div>
       <div class="items" id="items"></div>
     </div>
 
@@ -207,7 +210,7 @@ const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','
 const YEARS  = [2024, 2025, 2026, 2027];
 const ACTIVE_YEARS = [2024, 2025, 2026];
 
-const S = {mode:'inv', staff:'إيهاب', title:'ghali', items:new Map(), year:null, month:null, rtype:'maint', style:-1};
+const S = {mode:'inv', staff:'إيهاب', title:'ghali', items:new Map(), year:null, month:null, rtype:'maint', noInv:false, style:-1};
 const $ = id => document.getElementById(id);
 function store(k,v){try{localStorage.setItem('wasmart_'+k,v)}catch(e){}}
 function load(k){try{return localStorage.getItem('wasmart_'+k)}catch(e){return null}}
@@ -380,6 +383,7 @@ function examNote(c){
   return '';
 }
 function buildInv(){
+  if(S.noInv) return buildNoInv();
   if(!S.items.size || monthsAgo()===null) return null;
   const c=ctx(); const {g}=c;
   const P=perks(c);
@@ -406,6 +410,26 @@ function buildInv(){
     {t:'⚡ قصيرة', why:'سطرين واضحين للعميل اللي ما يحب الرسايل الطويلة.', x:short},
     {t:'🤝 ودّية', why:'تبدأ بالسؤال عنه شخصياً قبل المزايا، تحسسه إنها رسالة له هو.', x:warm}
   ];
+}
+
+/* ============ عميل بدون فاتورة ============ */
+function buildNoInv(){
+  const c=base(); const {g}=c;
+  const me=`معك فريق أوبتكال كلوب – تبوك بارك 👋`;
+  const ampm=`متى يناسبك ${g('تمر','تمرين')} علينا؟ الصباح ولا المساء؟ 🕘🌙`;
+  const P=[`👁️ فحص نظر مجاني`,`🎁 عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳`,`🔧 صيانة مجانية لنظارتك (شد وضبط) إذا حالتها تسمح`];
+  const full=J([c.greet, me, `حبينا نتواصل معك ونذكّرك بمزايا فرعنا 🌟`, ...P, `${g('تحب','تحبين')} نحجز لك وقت للفحص؟ ${g('رد','ردي')} بـ «تم» ونرتب لك ✅`]);
+  const short=J([c.greet, me, `👁️ فحص نظر مجاني • 🎁 الثانية مجاناً • 🔧 صيانة مجانية`, `حياك في تبوك بارك أي وقت ✅`]);
+  const warm=J([c.greet, me, `حبينا نكون أول من يخدمك في كل شي يخص نظرك ونظارتك 🤍`, `ابدأ${g('','ي')} بفحص نظر مجاني، و${g('تقدر تستفيد','تقدرين تستفيدين')} من عرض الثانية مجاناً على منتجات مختارة 🎁`, ampm]);
+  return [
+    {t:'⭐ الأنسب', why:'عميل جديد ما نعرف عنه شي، فنبدأ بالفحص المجاني لأنه أسهل سبب يجيبه الفرع بدون أي التزام.', x:full},
+    {t:'⚡ قصيرة', why:'سطر مزايا واضح ودعوة مفتوحة.', x:short},
+    {t:'🤝 ودّية', why:'تعريف لطيف بالفرع بدون إحساس إعلان.', x:warm}
+  ];
+}
+function applyNoInv(){
+  $('noInv').classList.toggle('on',S.noInv);
+  ['items','years','months','ago'].forEach(id=>{const e=$(id); e.style.opacity=S.noInv?'.35':''; e.style.pointerEvents=S.noInv?'none':'';});
 }
 
 /* ============ رسايل تقييم قوقل ============ */
@@ -485,11 +509,12 @@ $('copyBtn').onclick=async()=>{
   catch(e){$('msg').select();try{document.execCommand('copy');toast('تم النسخ ✅');}catch(_){toast('انسخ يدوي من المربع');}}
 };
 $('resetBtn').onclick=()=>{
-  S.title='ghali'; S.items=new Map(); S.month=null; S.style=-1;
+  S.title='ghali'; S.items=new Map(); S.month=null; S.noInv=false; applyNoInv(); S.style=-1;
   $('name').value=''; $('phone').value=''; $('msg').value='';
   drawTitles(); drawItems(); drawDate(); render(); $('name').focus();
 };
 $('name').addEventListener('input',render);
+$('noInv').onclick=()=>{S.noInv=!S.noInv; S.style=-1; applyNoInv(); render();};
 $('msg').addEventListener('input',updateWa);
 $('phone').addEventListener('input',updateWa);
 
