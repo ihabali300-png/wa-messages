@@ -411,7 +411,7 @@ function buildRev(){
   const mention = n===1 ? `ولو ${g('تذكر','تذكرين')} اسمي «${L[0]}» بالتقييم، يفرق معي والله 🤍`
                 : n>1 ? `ولو ${g('تذكر','تذكرين')} أسماءنا ${andJoin(L.map(x=>'«'+x+'»'))} بالتقييم، يفرق معنا والله 🤍` : '';
   const open = S.rtype==='maint' ? `إن شاء الله نظارتك صارت مريحة بعد الصيانة 🔧`
-                                 : `شكرًا لزيارتك 🤍 إن شاء الله ${g('طلعت','طلعتي')} من عندنا ${g('مرتاح','مرتاحة')}`;
+                                 : `شكرًا لزيارتك 🤍 إن شاء الله كانت تجربتك معنا حلوة 😊`;
   const full  = J([head, open, `لو عجبتك الخدمة، تقييمك على قوقل يفرق معنا كثير 🙏`, REVIEW_LINK, mention]);
   const short = J([c.greet, `تقييم بسيط منك على قوقل يفرق معنا كثير 🙏`, REVIEW_LINK]);
   const step  = J([head, `لو ${g('تقدر تقيّمنا','تقدرين تقيّمينا')} على قوقل: ${g('تفتح','تفتحين')} الرابط، ${g('تختار','تختارين')} النجوم، و${g('تكتب','تكتبين')} جملة بسيطة عن تجربتك ✍️`, REVIEW_LINK, mention]);
@@ -478,7 +478,7 @@ $('phone').addEventListener('input',updateWa);
 {const st=load('staff4'); if(st!==null) S.staff = st==='-'?[]:st.split('|');}
 drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
 /* ============ التحديثات ============ */
-const SMART_V = 3;
+const SMART_V = 4;
 (()=>{
   const box=$('upd');
   fetch('version.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
