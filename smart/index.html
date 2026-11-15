@@ -98,6 +98,14 @@
   .rtype b{display:block;font-size:16px}
   .rtype span{font-size:13px;color:var(--muted)}
   .rtype.on{border-color:var(--navy);background:#eef2f9;box-shadow:inset 0 0 0 1px var(--navy)}
+  .upd{position:fixed;left:20px;bottom:20px;background:#fff;border:2px solid var(--gold);border-radius:16px;padding:12px 14px;box-shadow:0 10px 30px rgba(15,35,64,.18);z-index:20;max-width:320px;display:none}
+  .upd.on{display:block}
+  .upd .uh{font-weight:800;font-size:15px}
+  .upd .uh small{background:var(--gold-soft);color:#6a5524;border-radius:999px;padding:1px 8px;font-size:12px;margin-right:4px}
+  .upd ul{margin:6px 0 10px;padding-right:18px;font-size:14px}
+  .upd .ub{display:flex;gap:8px}
+  .upd button{flex:1;border:none;border-radius:10px;padding:8px;font-family:inherit;font-weight:800;cursor:pointer}
+  .upd #updNow{background:var(--navy);color:#fff}.upd #updLater{background:#eceff4}
   @media (max-width:980px){
     .grid{grid-template-columns:1fr;padding:12px}
     .top h1{font-size:24px;letter-spacing:1px}
@@ -187,6 +195,7 @@
   </div>
 </div>
 
+<div class="upd" id="upd"><div class="uh">🆕 تحديث جديد <small id="updSize"></small> <span id="updVer" style="color:var(--muted);font-size:13px"></span></div><ul id="updList"></ul><div class="ub"><button id="updNow" type="button">⟳ حدّث دلوقتي</button><button id="updLater" type="button">بعدين</button></div></div>
 <div class="toast" id="toast">تم النسخ ✅</div>
 
 <script>
@@ -468,6 +477,19 @@ $('phone').addEventListener('input',updateWa);
 
 {const st=load('staff4'); if(st!==null) S.staff = st==='-'?[]:st.split('|');}
 drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
+/* ============ التحديثات ============ */
+const SMART_V = 2;
+(()=>{
+  const box=$('upd');
+  fetch('version.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
+    if((+j.v||0)<=SMART_V) return;
+    $('updVer').textContent='v'+j.v; $('updSize').textContent=j.size||'صغير';
+    $('updList').innerHTML=(j.notes||[]).map(n=>`<li>${n}</li>`).join('');
+    setTimeout(()=>box.classList.add('on'),1000);
+  }).catch(()=>{});
+  $('updNow').onclick=()=>location.replace(location.pathname+'?_='+Date.now());
+  $('updLater').onclick=()=>box.classList.remove('on');
+})();
 </script>
 </body>
 </html>
