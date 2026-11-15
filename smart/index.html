@@ -314,124 +314,78 @@ function agoText(a){ if(a===0) return 'هذا الشهر'; if(a===1) return 'ش�
 function base(){
   const T=TITLES.find(t=>t.id===S.title); const f=T?T.f:false;
   const g=(m,w)=>f?w:m;
-  const name=$('name').value.trim();
-  const tod=new Date().getHours()<12?'صباح الخير':'مساء الخير';
+  const name=($('name').value.trim().split(/\s+/)[0])||'';   // الاسم الأول بس
   let greet;
   if(S.title==='ghali')  greet=`هلا والله بالغالي${name?' '+name:''} ✨`;
   else if(S.title==='ghalia') greet=`هلا والله بالغالية${name?' '+name:''} ✨`;
-  else greet = name ? `هلا ${name}، ${tod} 🌷` : `هلا والله، ${tod} 🌷`;
+  else greet=`هلا والله${name?' '+name:''} ✨`;
   return {f,g,name,greet};
 }
 const J = arr => arr.filter(Boolean).join('\n');
+const BR = 'أوبتكال كلوب تبوك بارك';
+const OFFER = 'وعندنا عرض الثانية مجانًا على منتجات مختارة 🎁';
 
 /* ============ رسايل الفاتورة ============ */
 function ctx(){
-  const b=base(); const {g}=b;
+  const b=base();
   const q=id=>S.items.get(id)||0, has=id=>q(id)>0;
   const a=monthsAgo();
-  const me=`معك فريق أوبتكال كلوب – تبوك بارك 👋`;
-  const glassesN = q('rx')+q('sun')+q('frame')+q('lens');
-  const glasses = glassesN>0;
-  const clUser  = has('cl')||has('sol');
-  const small   = !glasses && !clUser && (has('acc')||has('drops'));
-  const many = glassesN>1;
+  const glassesN=q('rx')+q('sun')+q('frame')+q('lens');
+  const glasses=glassesN>0, many=glassesN>1;
   let thing;
   if(has('rx')&&has('sun')) thing='نظاراتك';
-  else if(has('rx')) thing = q('rx')>1?'نظاراتك الطبية':'نظارتك الطبية';
-  else if(has('sun')) thing = q('sun')>1?'نظاراتك الشمسية':'نظارتك الشمسية';
-  else if(has('frame')) thing = q('frame')>1?'إطاراتك':'إطارك';
-  else if(has('lens')) thing = many?'نظاراتك':'نظارتك';
+  else if(has('rx')) thing=q('rx')>1?'نظاراتك':'نظارتك';
+  else if(has('sun')) thing=q('sun')>1?'نظاراتك الشمسية':'نظارتك الشمسية';
+  else if(has('frame')) thing=q('frame')>1?'إطاراتك':'إطارك';
+  else if(has('lens')) thing=many?'نظاراتك':'نظارتك';
   else if(has('cl')) thing='عدساتك';
   else thing='مشترياتك';
   const plural = many || thing==='عدساتك' || thing==='مشترياتك';
-  const pr = plural?'هم':'ها';          // معها / معهم
-  const stage = a<=1 ? 'new' : a<=5 ? 'mid' : a<=11 ? 'late' : 'old';
-  return {...b,q,has,a,me,glasses,clUser,small,thing,plural,pr,stage,many};
+  const exam = a>=12;                              // سنة أو أكثر = فحص، أقل = صيانة
+  const stage = a<=1 ? 'new' : a<=5 ? 'mid' : 'old';
+  return {...b,has,a,glasses,thing,plural,exam,stage};
 }
-function itemLines(c){
-  const {g,has,q,stage}=c, L=[];
-  if(has('frame') && !has('rx') && !has('lens'))
-    L.push(`🔲 ولو ${g('حاب','حابة')} ${g('تركّب','تركّبين')} عدسات طبية على ${q('frame')>1?'إطاراتك':'إطارك'}، نقيس لك ونركّبها بدقة على وجهك`);
-  if(has('lens') && !has('rx') && !has('frame'))
-    L.push(`🔍 وإذا ${g('تفكر','تفكرين')} ${g('تجدد','تجددين')} الإطار، وصلتنا موديلات جديدة والعرض فرصة ممتازة`);
-  if(has('cl') && stage!=='new')
-    L.push(`💧 وإذا عدساتك اللاصقة قرّبت تخلص، نجهّزها لك قبل ما ${g('تحتاجها','تحتاجينها')}`);
-  if(has('sol') && !has('cl') && stage!=='new')
-    L.push(`🧴 وإذا المحلول قرّب يخلص، موجود عندنا دايم`);
-  if(has('drops'))
-    L.push(`💦 ولو ${g('تحس','تحسين')} بجفاف مستمر في العين، الفحص عندنا مجاني ونطمّن على عيونك`);
-  if(has('sun') && !has('rx') && !has('frame') && !has('lens'))
-    L.push(`😎 و${g('تقدر تاخذ','تقدرين تاخذين')} مع العرض نظارة طبية أو شمسية ثانية`);
-  return L;
-}
-function perks(c){
-  const maint = `🔧 صيانة مجانية ل${c.glasses?c.thing:'نظارتك'} (شد وضبط)، ولعملائنا الأولوية`;
-  const exam  = `👁️ فحص نظر مجاني`;
-  const offer = `🎁 عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳`;
-  if(c.glasses) return [maint, offer, exam];
-  if(c.clUser)  return [exam, offer, maint];
-  if(c.small)   return [offer, exam, maint];
-  return [offer, maint, exam];
-}
-function opening(c){
-  const {g,stage,thing,pr}=c;
-  switch(stage){
-    case 'new':  return `شكراً لثقتك فينا 🤍 حبيت أطمّن عليك: ${thing} عاجبتك؟ ${g('مرتاح','مرتاحة')} مع${pr}؟`;
-    case 'mid':  return `صار ل${thing} معك كم شهر، وحبيت أذكّرك بمزايا خاصة لك ${g('كعميل','كعميلة')} عندنا 🌟`;
-    case 'late': return `قرّبت سنة على زيارتك، وحبيت أذكّرك إن عندنا لك مزايا تستاهل ${g('تمر','تمرين')} عشانها 🌟`;
-    default:     return `صار لك فترة ما شرّفتنا 🌷 ونتشرف بزيارتك من جديد، وعندنا لك مزايا خاصة ${g('كعميل','كعميلة')} عندنا`;
-  }
-}
-function examNote(c){
-  if(c.stage==='old' || c.stage==='late'){
-    if(c.has('cl')) return `👁️ ولابسي العدسات اللاصقة ينصح لهم بفحص سنوي، والفحص عندنا مجاني`;
-    if(c.glasses) return `👁️ وينصحون بفحص النظر بشكل دوري لأن المقاس ممكن يتغير بدون ما نحس`;
-  }
-  return '';
+function perkLine(c, withBranch, soft){
+  const {g}=c; const at = withBranch ? ` في ${BR}` : '';
+  if(soft && c.exam) return `والفحص عندنا مجاني لو ${g('حاب تطمّن','حابة تطمّنين')} على نظرك 👁️`;
+  if(soft && c.glasses) return `ولو ${c.plural?'احتاجوا':'احتاجت'} شد أو ضبط، نسويها لك مجانًا 🔧`;
+  if(c.exam) return `صار وقت ${g('تفحص','تفحصين')} نظرك؟ الفحص مجاني عندنا${at} 👁️`;
+  if(c.glasses) return `${c.thing} تحتاج شد وضبط؟ نسويها لك مجانًا${at} 🔧`;
+  return `لو عندك نظارة تحتاج شد وضبط، نسويها لك مجانًا${at} 🔧`;
 }
 function buildInv(){
   if(S.noInv) return buildNoInv();
   if(!S.items.size || monthsAgo()===null) return null;
   const c=ctx(); const {g}=c;
-  const P=perks(c);
-  const ampm=`متى يناسبك ${g('تمر','تمرين')} علينا؟ الصباح ولا المساء؟ 🕘🌙`;
-  const ask =`${g('تحب','تحبين')} نحجز لك وقت؟ ${g('رد','ردي')} بـ «تم» ونرتب لك ✅`;
-  const cta = c.stage==='new' ? `وأي ملاحظة مهما كانت بسيطة ${g('قل','قولي')} لنا 🌷` : (c.stage==='old'?ask:ampm);
-  const full = J([c.greet, c.me, opening(c), ...P, ...itemLines(c), examNote(c), cta]);
-  const short = J([c.greet, c.me,
-    c.stage==='new' ? `شكراً لثقتك فينا 🤍` : `حبيت أذكّرك بمزاياك عندنا:`,
-    `${P[0].split('،')[0]} • 👁️ فحص مجاني • 🎁 الثانية مجاناً`,
-    `حياك أي وقت ✅`]);
-  const warm = J([c.greet, c.me,
-    c.stage==='new' ? `حبيت أقول لك تشرفنا فيك 🤍 وأي وقت ${g('تحتاج','تحتاجين')} شي في ${c.thing} حنا موجودين`
-                    : `تذكرناك وحبينا نطمّن عليك 😊 كيف ${c.thing} معك؟`,
-    c.glasses ? `🔧 ${g('مرّ','مرّي')} علينا نسوي ل${c.pr} صيانة وضبط مجاني، ولعملائنا الأولوية`
-              : `👁️ و${g('تقدر تسوي','تقدرين تسوين')} فحص نظر مجاني أي وقت`,
-    `🎁 والحين عندنا عرض الثانية مجاناً على منتجات مختارة`,
-    ...itemLines(c).slice(0,1), ampm]);
-  const whyFull = c.glasses ? 'تبدأ بالصيانة المجانية لأنها أقرب سبب يخليه يمر بنظارته، وبعدها العرض والفحص.'
-               : c.clUser ? 'تبدأ بالفحص المجاني لأنه الأهم لعميل العدسات اللاصقة، وبعدها العرض.'
-               : 'تبدأ بالعرض لأنه أقوى سبب للزيارة لعميل مشترياته بسيطة.';
+  const head=`${c.greet} معك فريق ${BR}`;
+  const when=`${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🕘🌙`;
+  const pr = c.plural?'معهم':'معها';
+  const open = c.stage==='new' ? `إن شاء الله ${c.thing} عاجبتك و${g('مرتاح','مرتاحة')} ${pr} 🤍`
+             : c.stage==='mid' ? `حبينا نطمّن عليك، كيف ${c.thing} معك؟ 😊`
+             : `صار لك فترة ما شفناك 🌷 وحابين نشوفك قريب`;
+  const full  = J([head, open, perkLine(c,false,c.stage==='new'), OFFER, when]);
+  const short = J([c.greet, perkLine(c,true), `وعندنا عرض الثانية مجانًا 🎁 ${when}`]);
+  const warm  = J([head, `حبينا نطمّن عليك، كيف ${c.thing} معك؟ 😊`, perkLine(c,false,true), `${OFFER} ${when}`]);
+  const why = c.exam ? 'آخر زيارة من سنة أو أكثر، فالسبب المجاني هو الفحص.' : 'آخر زيارة أقل من سنة، فالسبب المجاني هو الصيانة.';
   return [
-    {t:'⭐ الأنسب', why:whyFull, x:full},
-    {t:'⚡ قصيرة', why:'سطرين واضحين للعميل اللي ما يحب الرسايل الطويلة.', x:short},
-    {t:'🤝 ودّية', why:'تبدأ بالسؤال عنه شخصياً قبل المزايا، تحسسه إنها رسالة له هو.', x:warm}
+    {t:'⭐ الأنسب', why:why+' سطر للعرض وسؤال واحد في الآخر.', x:full},
+    {t:'⚡ قصيرة', why:'ثلاث سطور: السبب المجاني، العرض، والسؤال.', x:short},
+    {t:'🤝 ودّية', why:'تبدأ بالسؤال عنه شخصيًا قبل أي شي.', x:warm}
   ];
 }
 
 /* ============ عميل بدون فاتورة ============ */
 function buildNoInv(){
   const c=base(); const {g}=c;
-  const me=`معك فريق أوبتكال كلوب – تبوك بارك 👋`;
-  const ampm=`متى يناسبك ${g('تمر','تمرين')} علينا؟ الصباح ولا المساء؟ 🕘🌙`;
-  const P=[`👁️ فحص نظر مجاني`,`🎁 عرض: اشترِ واحدة والثانية مجاناً على منتجات مختارة، لفترة محدودة ⏳`,`🔧 صيانة مجانية لنظارتك (شد وضبط) إذا حالتها تسمح`];
-  const full=J([c.greet, me, `حبينا نتواصل معك ونذكّرك بمزايا فرعنا 🌟`, ...P, `${g('تحب','تحبين')} نحجز لك وقت للفحص؟ ${g('رد','ردي')} بـ «تم» ونرتب لك ✅`]);
-  const short=J([c.greet, me, `👁️ فحص نظر مجاني • 🎁 الثانية مجاناً • 🔧 صيانة مجانية`, `حياك في تبوك بارك أي وقت ✅`]);
-  const warm=J([c.greet, me, `حبينا نكون أول من يخدمك في كل شي يخص نظرك ونظارتك 🤍`, `ابدأ${g('','ي')} بفحص نظر مجاني، و${g('تقدر تستفيد','تقدرين تستفيدين')} من عرض الثانية مجاناً على منتجات مختارة 🎁`, ampm]);
+  const head=`${c.greet} معك فريق ${BR}`;
+  const book=`${g('تحب','تحبين')} نحجز لك وقت؟ 🕘`;
+  const full  = J([head, `حابين نشوفك عندنا قريب 🌷`, `فحص النظر عندنا مجاني 👁️`, OFFER, book]);
+  const short = J([c.greet, `فحص النظر مجاني عندنا في ${BR} 👁️`, `وعندنا عرض الثانية مجانًا 🎁 ${book}`]);
+  const warm  = J([head, `حبينا نعرّفك على فرعنا 😊 الفحص عندنا مجاني ${g('وتقدر','وتقدرين')} ${g('تمر','تمرين')} أي وقت 👁️`, `${OFFER} ${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🌙`]);
   return [
-    {t:'⭐ الأنسب', why:'عميل جديد ما نعرف عنه شي، فنبدأ بالفحص المجاني لأنه أسهل سبب يجيبه الفرع بدون أي التزام.', x:full},
-    {t:'⚡ قصيرة', why:'سطر مزايا واضح ودعوة مفتوحة.', x:short},
-    {t:'🤝 ودّية', why:'تعريف لطيف بالفرع بدون إحساس إعلان.', x:warm}
+    {t:'⭐ الأنسب', why:'عميل ما نعرف عنه شي، فالسبب المجاني هو الفحص.', x:full},
+    {t:'⚡ قصيرة', why:'ثلاث سطور: الفحص، العرض، والسؤال.', x:short},
+    {t:'🤝 ودّية', why:'تعريف خفيف بالفرع بدون إحساس إعلان.', x:warm}
   ];
 }
 function applyNoInv(){
@@ -442,39 +396,20 @@ function applyNoInv(){
 /* ============ رسايل تقييم قوقل ============ */
 function buildRev(){
   if(!S.rtype) return null;
-  const c=base(); const {g}=c; const L=S.staff; const st=L.length;
+  const c=base(); const {g}=c; const L=S.staff; const n=L.length;
   const andJoin = a => a.length<2 ? (a[0]||'') : a.slice(0,-1).join('، ')+' و'+a[a.length-1];
-  const me = st===1 ? `معك ${L[0]} من أوبتكال كلوب – تبوك بارك 👋`
-           : st>1 ? `معك فريق أوبتكال كلوب – تبوك بارك (${andJoin(L)}) 👋`
-           : `معك فريق أوبتكال كلوب – تبوك بارك 👋`;
-  const link = `⭐ رابط التقييم (ياخذ أقل من دقيقة):\n${REVIEW_LINK}`;
-  const mention = st===1 ? `ولو ${g('تذكر','تذكرين')} اسمي «${L[0]}» في التقييم، تسعدني والله 🤍`
-                : st>1 ? `ولو ${g('تذكر','تذكرين')} أسماءنا ${andJoin(L.map(x=>'«'+x+'»'))} في التقييم، تسعدنا والله 🤍` : '';
-  const steps = J([`١- ${g('افتح','افتحي')} الرابط 👆`, `٢- ${g('اختار','اختاري')} عدد النجوم ⭐`, `٣- ${g('اكتب','اكتبي')} جملة بسيطة عن تجربتك ✍️`]);
-  let main, short, step, why;
-  if(S.rtype==='maint'){
-    main = J([c.greet, me,
-      `سعدنا نخدمك في صيانة نظارتك 🔧 ونتمنى إنها صارت مريحة مثل أول ✨`,
-      `لو عجبتك الخدمة، تقييمك على قوقل يفرق معنا كثير ويساعد غيرك يعرفنا 🙏`,
-      link, mention]);
-    short = J([c.greet, `سعدنا بخدمتك في صيانة نظارتك 🔧`, `${g('تقدر تساعدنا','تقدرين تساعدينا')} بتقييم بسيط على قوقل؟ 🙏`, REVIEW_LINK]);
-    why = 'تربط التقييم بخدمة مجانية لسه عاملينها له، فيحس إن التقييم رد جميل بسيط.';
-  } else {
-    main = J([c.greet, me,
-      `شكراً لزيارتك لنا 🤍 ونتمنى إنك ${g('طلعت','طلعتي')} من عندنا ${g('مرتاح وراضي','مرتاحة وراضية')} 🌷`,
-      `رأيك يهمنا كثير، ولو تجربتك معنا كانت حلوة يسعدنا تقييمك على قوقل 🙏`,
-      link, mention]);
-    short = J([c.greet, `شكراً لزيارتك لأوبتكال كلوب – تبوك بارك 🤍`, `يسعدنا رأيك بتقييم سريع على قوقل 🙏`, REVIEW_LINK]);
-    why = 'تبدأ بالشكر والاطمئنان على رضاه، وبعدها تطلب التقييم بلطف.';
-  }
-  step = J([c.greet, me,
-    S.rtype==='maint' ? `شكراً إنك ${g('اخترتنا','اخترتينا')} لصيانة نظارتك 🔧` : `شكراً لزيارتك لنا 🤍`,
-    `لو ${g('تقدر','تقدرين')} ${g('تدعمنا','تدعمينا')} بتقييم على قوقل، هذي الطريقة بثلاث خطوات بس:`,
-    steps, REVIEW_LINK, mention]);
+  const head = n===1 ? `${c.greet} معك ${L[0]} من ${BR}` : `${c.greet} معك فريق ${BR}`;
+  const mention = n===1 ? `ولو ${g('تذكر','تذكرين')} اسمي «${L[0]}» بالتقييم، يفرق معي والله 🤍`
+                : n>1 ? `ولو ${g('تذكر','تذكرين')} أسماءنا ${andJoin(L.map(x=>'«'+x+'»'))} بالتقييم، يفرق معنا والله 🤍` : '';
+  const open = S.rtype==='maint' ? `إن شاء الله نظارتك صارت مريحة بعد الصيانة 🔧`
+                                 : `شكرًا لزيارتك 🤍 إن شاء الله ${g('طلعت','طلعتي')} من عندنا ${g('مرتاح','مرتاحة')}`;
+  const full  = J([head, open, `لو عجبتك الخدمة، تقييمك على قوقل يفرق معنا كثير 🙏`, REVIEW_LINK, mention]);
+  const short = J([c.greet, `تقييم بسيط منك على قوقل يفرق معنا كثير 🙏`, REVIEW_LINK]);
+  const step  = J([head, `لو ${g('تقدر تقيّمنا','تقدرين تقيّمينا')} على قوقل: ${g('تفتح','تفتحين')} الرابط، ${g('تختار','تختارين')} النجوم، و${g('تكتب','تكتبين')} جملة بسيطة عن تجربتك ✍️`, REVIEW_LINK, mention]);
   return [
-    {t:'⭐ الأنسب', why, x:main},
+    {t:'⭐ الأنسب', why: S.rtype==='maint' ? 'تربط التقييم بالصيانة المجانية اللي سويناها له.' : 'تشكره على الزيارة وبعدها تطلب التقييم بلطف.', x:full},
     {t:'⚡ قصيرة', why:'سطرين ورابط، للعميل المستعجل.', x:short},
-    {t:'🪜 خطوة بخطوة', why:'تشرح له الخطوات، مناسبة لكبار السن أو اللي ما جرّب يقيّم قبل.', x:step}
+    {t:'🪜 خطوة بخطوة', why:'تشرح الخطوات في سطر واحد، مناسبة للي ما جرّب يقيّم قبل.', x:step}
   ];
 }
 
