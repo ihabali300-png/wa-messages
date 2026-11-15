@@ -367,7 +367,7 @@ function buildInv(){
   if(!S.items.size || monthsAgo()===null) return null;
   const c=ctx(); const {g}=c;
   const head=`${c.greet} معك فريق ${BR}`;
-  const when=`${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🕘🌙`;
+  const when= c.exam ? `نحجز لك موعد الصباح ولا المساء؟ 🕘🌙` : `${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🕘🌙`;
   const pr = c.plural?'معهم':'معها';
   const open = c.stage==='new' ? `إن شاء الله ${c.thing} عاجبتك و${g('مرتاح','مرتاحة')} ${pr} 🤍`
              : c.stage==='mid' ? `حبينا نطمّن عليك، كيف ${c.thing} معك؟ 😊`
@@ -387,10 +387,10 @@ function buildInv(){
 function buildNoInv(){
   const c=base(); const {g}=c;
   const head=`${c.greet} معك فريق ${BR}`;
-  const book=`${g('تحب','تحبين')} نحجز لك وقت؟ 🕘`;
+  const book=`نحجز لك موعد الصباح ولا المساء؟ 🕘🌙`;
   const full  = J([head, `حابين نشوفك عندنا قريب 🌷`, `فحص النظر عندنا مجاني 👁️`, OFFER, book]);
   const short = J([c.greet, `فحص النظر مجاني عندنا في ${BR} 👁️`, `وعندنا عرض الثانية مجانًا 🎁 ${book}`]);
-  const warm  = J([head, `حبينا نعرّفك على فرعنا 😊 الفحص عندنا مجاني ${g('وتقدر','وتقدرين')} ${g('تمر','تمرين')} أي وقت 👁️`, `${OFFER} ${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🌙`]);
+  const warm  = J([head, `حبينا نعرّفك على فرعنا 😊 والفحص عندنا مجاني 👁️`, `${OFFER} ${book}`]);
   return [
     {t:'⭐ الأنسب', why:'عميل ما نعرف عنه شي، فالسبب المجاني هو الفحص.', x:full},
     {t:'⚡ قصيرة', why:'ثلاث سطور: الفحص، العرض، والسؤال.', x:short},
@@ -478,7 +478,7 @@ $('phone').addEventListener('input',updateWa);
 {const st=load('staff4'); if(st!==null) S.staff = st==='-'?[]:st.split('|');}
 drawStaff(); drawRtypes(); drawTitles(); drawItems(); drawDate(); setMode('inv');
 /* ============ التحديثات ============ */
-const SMART_V = 2;
+const SMART_V = 3;
 (()=>{
   const box=$('upd');
   fetch('version.json?_='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
