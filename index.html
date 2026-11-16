@@ -240,7 +240,7 @@ function greet(){
   return "هلا والله ✨";
 }
 const OFFER="🎁 وعندنا عرض: اشترِ واحدة والثانية مجانًا على منتجات مختارة ⏳ لفترة محدودة";
-const VISIT=()=>G("تمر علينا الصباح ولا المساء؟ 🕘🌙","تمرين علينا الصباح ولا المساء؟ 🕘🌙");
+const VISIT=()=>"نحجز لك موعد الصباح ولا المساء؟ 🕘🌙";
 const TRY=()=>G("الموديلات ما تنحكم عليها بالصورة، لازم تجربها على وجهك 😉","الموديلات ما تنحكم عليها بالصورة، لازم تجربينها على وجهك 😉");
 
 const FIXL=c=>glassesCount()>0?"وصيانة "+c.p+" عندنا مجانية 🔧":null;
@@ -494,7 +494,7 @@ render();
 </script>
 <div id="updCard"><div class="uh"><span id="updTitle">🆕 الجديد في التحديث</span> <b id="updVer"></b></div><ul id="updList"></ul><div class="ub"><button id="updNow">⟳ حدّث دلوقتي</button><button id="updLater">بعدين</button></div></div>
 <script>
-const APP_V = 4;
+const APP_V = 5;
 (()=>{
   const u=id=>document.getElementById(id),btn=u('updBtn'),card=u('updCard');let info=null;
   const show=(j,done)=>{u('updVer').textContent='v'+j.v;u('updList').innerHTML=(j.notes||[]).map(n=>`<li>${n}</li>`).join('')||'<li>تحسينات عامة</li>';

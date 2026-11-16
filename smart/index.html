@@ -367,7 +367,7 @@ function buildInv(){
   if(!S.items.size || monthsAgo()===null) return null;
   const c=ctx(); const {g}=c;
   const head=`${c.greet} معك فريق ${BR}`;
-  const when= c.exam ? `نحجز لك موعد الصباح ولا المساء؟ 🕘🌙` : `${g('تمر','تمرين')} علينا الصباح ولا المساء؟ 🕘🌙`;
+  const when= `نحجز لك موعد الصباح ولا المساء؟ 🕘🌙`;
   const pr = c.plural?'معهم':'معها';
   const open = c.stage==='new' ? `إن شاء الله ${c.thing} عاجبتك و${g('مرتاح','مرتاحة')} ${pr} 🤍`
              : c.stage==='mid' ? `حبينا نطمّن عليك، كيف ${c.thing} معك؟ 😊`
